@@ -1,0 +1,67 @@
+{% comment %}
+  Shared by every layout. The polled GraphQL response arrives as `data`
+  (or `errors` when AppSignal rejects the request).
+{% endcomment %}
+{% assign app = data.app %}
+{% assign now_seconds = "now" | date: "%s" | plus: 0 %}
+
+{% assign open_exception_count = app.openExceptions | size %}
+{% assign open_performance_count = app.openPerformance | size %}
+
+{% assign monitors_down = 0 %}
+{% for monitor in app.uptimeMonitors %}
+  {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
+  {% if open_alerts.size > 0 %}{% assign monitors_down = monitors_down | plus: 1 %}{% endif %}
+{% endfor %}
+{% assign monitor_count = app.uptimeMonitors | size %}
+
+{% template capped_count %}{% if count >= 100 %}99+{% else %}{{ count }}{% endif %}{% endtemplate %}
+
+{% template time_ago %}{% assign seconds = now | minus: at | at_least: 0 %}{% if seconds < 3600 %}{{ seconds | divided_by: 60 }}m{% elsif seconds < 86400 %}{{ seconds | divided_by: 3600 }}h{% else %}{{ seconds | divided_by: 86400 }}d{% endif %} ago{% endtemplate %}
+
+{% template exception_item %}
+<div class="item">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="title title--small lg:title--large" data-clamp="1">{{ incident.exceptionName | default: "Unknown error" | escape }}</span>
+    {% if detailed %}<span class="description lg:description--xlarge" data-clamp="1">{{ incident.exceptionMessage | escape }}</span>{% endif %}
+    <div class="flex gap--small">
+      <span class="label label--small lg:label--large">#{{ incident.number }}</span>
+      <span class="label label--small lg:label--large label--underline">{{ incident.count | number_with_delimiter }}x</span>
+      <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
+      {% if detailed %}<span class="label label--small lg:label--large label--gray 1bit:text--black" data-clamp="1">{{ incident.actionNames | first | default: incident.namespace | escape }}</span>{% endif %}
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
+{% template performance_item %}
+<div class="item">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="title title--small lg:title--large" data-clamp="1">{{ incident.actionNames | first | default: incident.namespace | escape }}</span>
+    <div class="flex gap--small">
+      <span class="label label--small lg:label--large">#{{ incident.number }}</span>
+      <span class="label label--small lg:label--large label--underline">{{ incident.mean | round }}ms mean</span>
+      <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
+      {% if incident.hasNPlusOne %}<span class="label label--small lg:label--large label--inverted">N+1</span>{% endif %}
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
+{% template problem %}
+<div class="layout layout--col layout--center gap--small">
+  <span class="title">AppSignal did not answer</span>
+  <span class="description text--center">
+    {% if errors %}{{ errors | map: "message" | join: "; " | escape }}{% else %}Check the API token and app ID in the plugin settings.{% endif %}
+  </span>
+</div>
+{% endtemplate %}
+
+{% template title_bar %}
+<div class="title_bar">
+  <span class="title">AppSignal</span>
+  <span class="instance">{{ app.name | escape }} {{ app.environment | escape }}</span>
+</div>
+{% endtemplate %}

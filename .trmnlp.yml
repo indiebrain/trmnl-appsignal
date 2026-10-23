@@ -1,0 +1,23 @@
+# TRMNLP configuration
+# {{ env.VARIABLE }} interpolation is available here
+---
+# auto-reload when files change (`watch: false` to disable)
+watch:
+  - .trmnlp.yml
+  - src
+
+# Values of the custom fields defined in src/settings.yml, read from the
+# environment so the token stays out of version control.
+custom_fields:
+  api_token: "{{ env.APPSIGNAL_API_TOKEN }}"
+  app_id: "{{ env.APPSIGNAL_APP_ID }}"
+
+time_zone: America/New_York
+
+# override variables
+variables:
+  trmnl: {}
+
+# A private plugin, so no author contact is needed.
+ignored_lint_rules:
+  - author_contact_method

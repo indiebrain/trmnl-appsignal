@@ -1,0 +1,30 @@
+{
+  "data": {
+    "app": {
+      "id": "5f0c3a9e8b1d2c4e6a7f9b10",
+      "name": "example-app",
+      "environment": "production",
+      "openExceptions": [{"number": 412}, {"number": 409}, {"number": 398}, {"number": 377}, {"number": 351}, {"number": 344}, {"number": 310}],
+      "openPerformance": [{"number": 405}, {"number": 388}, {"number": 362}],
+      "exceptionIncidents": [
+        {"number": 412, "count": 1843, "lastOccurredAt": "2026-10-23T14:56:00Z", "exceptionName": "ActiveRecord::RecordNotFound", "exceptionMessage": "Couldn't find Shift with 'id'=88123", "namespace": "web", "actionNames": ["ShiftsController#show"], "severity": "HIGH"},
+        {"number": 409, "count": 312, "lastOccurredAt": "2026-10-23T14:21:00Z", "exceptionName": "Net::ReadTimeout", "exceptionMessage": "Net::ReadTimeout with #<TCPSocket:(closed)>", "namespace": "background", "actionNames": ["SyncCalendarJob#perform"], "severity": "CRITICAL"},
+        {"number": 398, "count": 57, "lastOccurredAt": "2026-10-23T11:02:00Z", "exceptionName": "NoMethodError", "exceptionMessage": "private method 'email' called for nil", "namespace": "web", "actionNames": ["RostersController#export"], "severity": "UNTRIAGED"},
+        {"number": 377, "count": 21, "lastOccurredAt": "2026-10-22T19:40:00Z", "exceptionName": "Redis::CannotConnectError", "exceptionMessage": "Error connecting to Redis on 10.0.0.12:6379 (Errno::ECONNREFUSED)", "namespace": "background", "actionNames": ["ReminderMailerJob#perform"], "severity": "HIGH"},
+        {"number": 351, "count": 9, "lastOccurredAt": "2026-10-21T08:15:00Z", "exceptionName": "ActionController::InvalidAuthenticityToken", "exceptionMessage": "Can't verify CSRF token authenticity.", "namespace": "web", "actionNames": ["SessionsController#create"], "severity": "LOW"},
+        {"number": 344, "count": 4, "lastOccurredAt": "2026-10-19T22:33:00Z", "exceptionName": "JSON::ParserError", "exceptionMessage": "unexpected token at '<html>'", "namespace": "background", "actionNames": ["ImportHolidaysJob#perform"], "severity": "LOW"},
+        {"number": 310, "count": 2, "lastOccurredAt": "2026-10-12T06:00:00Z", "exceptionName": "ArgumentError", "exceptionMessage": "invalid date", "namespace": "web", "actionNames": ["ReportsController#index"], "severity": "UNTRIAGED"}
+      ],
+      "performanceIncidents": [
+        {"number": 405, "count": 940, "lastOccurredAt": "2026-10-23T14:50:00Z", "namespace": "web", "actionNames": ["RostersController#index"], "severity": "HIGH", "mean": 2381.4, "hasNPlusOne": true},
+        {"number": 388, "count": 120, "lastOccurredAt": "2026-10-23T09:12:00Z", "namespace": "background", "actionNames": ["NightlyDigestJob#perform"], "severity": "LOW", "mean": 18450.2, "hasNPlusOne": false},
+        {"number": 362, "count": 33, "lastOccurredAt": "2026-10-20T17:45:00Z", "namespace": "web", "actionNames": ["Api::ShiftsController#update"], "severity": "UNTRIAGED", "mean": 812.9, "hasNPlusOne": false}
+      ],
+      "uptimeMonitors": [
+        {"name": "Homepage", "url": "https://example-app.example.com", "alerts": [{"state": "CLOSED"}]},
+        {"name": "API", "url": "https://example-app.example.com/api/health", "alerts": [{"state": "OPEN"}, {"state": "CLOSED"}]},
+        {"name": "Status", "url": "https://example-app.example.com/up", "alerts": []}
+      ]
+    }
+  }
+}

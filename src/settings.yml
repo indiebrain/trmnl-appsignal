@@ -1,0 +1,29 @@
+#
+# Changes to this file will be overwritten by `trmnlp pull`.
+#
+# Docs: https://help.trmnl.com/en/articles/10542599-importing-and-exporting-private-plugins#h_581fb988f0
+#
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: post
+framework_version: latest
+polling_url: https://appsignal.com/graphql?token={{ api_token }}
+polling_headers: 'Content-Type: application/json'
+polling_body: '{"query":"query TrmnlAppsignal($appId: String!) { app(id: $appId) { id name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } }","variables":{"appId":"{{ app_id }}"}}'
+name: AppSignal
+description: Open AppSignal incidents
+refresh_interval: 15
+custom_fields:
+- keyname: api_token
+  name: Personal API token
+  field_type: password
+  description: Found under Personal settings, API tokens, in AppSignal.
+  help_text: The token reads every app your AppSignal user can see.
+- keyname: app_id
+  name: App ID
+  field_type: string
+  description: The ID from the app's settings page, or from the address bar (appsignal.com/your-org/sites/APP_ID).
+  placeholder: 5f0c3a9e8b1d2c4e6a7f9b10

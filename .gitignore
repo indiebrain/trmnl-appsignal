@@ -1,0 +1,8 @@
+# trmnlp build output
+_build/
+
+# trmnlp test --report output
+report/
+
+# local secrets for mise
+mise.local.toml

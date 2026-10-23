@@ -1,0 +1,13 @@
+{% if app %}
+<div class="layout layout--col layout--center gap--small">
+  <span class="value value--xlarge lg:value--mega value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+  <span class="label lg:label--xlarge">Open errors</span>
+  <span class="description lg:description--xlarge">
+    {% render "capped_count", count: open_performance_count %} slow, {{ monitors_down }}/{{ monitor_count }} monitors down
+  </span>
+</div>
+{% else %}
+  {% render "problem", errors: errors %}
+{% endif %}
+
+{% render "title_bar", app: app %}

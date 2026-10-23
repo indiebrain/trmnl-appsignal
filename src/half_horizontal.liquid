@@ -1,0 +1,31 @@
+{% if app %}
+<div class="layout gap--base">
+  <div class="flex flex--col gap--small">
+    <div class="item">
+      <div class="content">
+        <span class="value value--large lg:value--xxxlarge value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+        <span class="label lg:label--xlarge">Open errors</span>
+      </div>
+    </div>
+    <div class="item">
+      <div class="content">
+        <span class="value value--large lg:value--xxxlarge value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+        <span class="label lg:label--xlarge">Monitors down</span>
+      </div>
+    </div>
+  </div>
+  <div class="columns stretch-x" data-overflow-max-cols="1" data-overflow-max-cols-lg="2">
+    <div class="column" data-overflow="true" data-overflow-counter="true">
+      {% for incident in app.exceptionIncidents %}
+        {% render "exception_item", incident: incident, now: now_seconds, detailed: false %}
+      {% else %}
+        <span class="description lg:description--xlarge">No open errors.</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+  {% render "problem", errors: errors %}
+{% endif %}
+
+{% render "title_bar", app: app %}

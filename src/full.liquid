@@ -1,0 +1,47 @@
+{% if app %}
+<div class="layout layout--col gap--base">
+  <div class="grid grid--cols-3 w--full">
+    <div class="item">
+      <div class="content">
+        <span class="value value--xlarge lg:value--mega value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+        <span class="label lg:label--xlarge">Open errors</span>
+      </div>
+    </div>
+    <div class="item">
+      <div class="content">
+        <span class="value value--xlarge lg:value--mega value--tnums">{% render "capped_count", count: open_performance_count %}</span>
+        <span class="label lg:label--xlarge">Slow actions</span>
+      </div>
+    </div>
+    <div class="item">
+      <div class="content">
+        <span class="value value--xlarge lg:value--mega value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+        <span class="label lg:label--xlarge">Monitors down</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="columns w--full">
+    <div class="column" data-overflow="true" data-overflow-counter="true">
+      <span class="label label--underline lg:label--xlarge">Latest errors</span>
+      {% for incident in app.exceptionIncidents %}
+        {% render "exception_item", incident: incident, now: now_seconds, detailed: true %}
+      {% else %}
+        <span class="description lg:description--xlarge">No open errors.</span>
+      {% endfor %}
+    </div>
+    <div class="column" data-overflow="true" data-overflow-counter="true">
+      <span class="label label--underline lg:label--xlarge">Latest performance issues</span>
+      {% for incident in app.performanceIncidents %}
+        {% render "performance_item", incident: incident, now: now_seconds %}
+      {% else %}
+        <span class="description lg:description--xlarge">No open performance issues.</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+  {% render "problem", errors: errors %}
+{% endif %}
+
+{% render "title_bar", app: app %}
