@@ -15,6 +15,19 @@ your own is needed. It signs in with OAuth and asks only for the `app:read`
 scope: TRMNL never holds a personal API token, and the token it does hold can
 only read, belongs to one organization, and can be revoked on its own.
 
+## What installers trust
+
+Installing the recipe (rather than forking it) means taking every update its
+publisher pushes, and each update runs with the installer's AppSignal token. A
+publisher, or anyone who takes over the publisher's TRMNL account, could change
+where the plugin sends requests and collect those tokens. Each token can only
+read, and only what its installer approved. To limit this:
+
+- The publisher keeps two-step sign-in on for TRMNL and GitHub.
+- Installers who would rather not take updates choose **Fork**, which copies the
+  plugin as it is.
+- Anyone can revoke the plugin's access in AppSignal at any time.
+
 ## Setup
 
 1. Install Ruby and the TRMNL preview tool (`trmnlp`) with `mise install`.
@@ -110,8 +123,8 @@ image even on an ARM Mac: fonts draw a pixel differently on ARM, and the
 pictures must match the ones GitHub Actions draws.
 
 ```sh
-docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp test
-docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp test --update   # re-record snapshots
+docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp:v0.32.3 test
+docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp:v0.32.3 test --update   # re-record snapshots
 ```
 
 They render every view against a canned response (`tests/fixtures/`) on the
