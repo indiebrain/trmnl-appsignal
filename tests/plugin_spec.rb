@@ -56,6 +56,15 @@ RSpec.describe 'AppSignal' do
     expect(screen.result.html).to include('Api::&#8203;ShiftsController#&#8203;update')
   end
 
+  it 'shows example data when the organization is demo, whatever AppSignal answers' do
+    not_found = { 'https://appsignal.com/graphql*' => { json: { errors: [{ message: 'Object not found.' }] } } }
+    screen = trmnl.render(mocks: not_found, custom_fields: { 'organization' => ' Demo ' }, now:)
+
+    expect(screen.result.html).to include('example-app')
+    expect(screen.result.html).to include('4m ago')
+    expect(screen.result.html).not_to include('AppSignal did not answer')
+  end
+
   it 'explains a rejected request' do
     rejected = { 'https://appsignal.com/graphql*' => { json: { errors: [{ message: 'Not authorized' }] } } }
     screen = trmnl.render(mocks: rejected, custom_fields:, now:)

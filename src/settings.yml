@@ -24,12 +24,14 @@ custom_fields:
     <strong>Setup</strong><br/>
     1. Click the OAuth <strong>Connect</strong> button and sign in to AppSignal. When asked, pick the app to show. The plugin only asks for read access, which you can revoke in AppSignal at any time.<br/>
     2. Fill in your organization name: the part after appsignal.com/ in the address bar when you open AppSignal.<br/>
-    3. Save, and add the plugin to a playlist.
+    3. Save, and add the plugin to a playlist.<br/>
+    <br/>
+    To see example data without connecting, enter <strong>demo</strong> as the organization.
   github_url: https://github.com/indiebrain/trmnl-appsignal
 - keyname: organization
   name: Organization
   field_type: string
-  description: The name after appsignal.com/ in the address bar when you open AppSignal (appsignal.com/ORGANIZATION/...).
+  description: The name after appsignal.com/ in the address bar when you open AppSignal (appsignal.com/ORGANIZATION/...). Enter demo to see example data.
   placeholder: example-org
 oauth_enabled: 'true'
 oauth_authorize_url: https://appsignal.com/oauth/authorize

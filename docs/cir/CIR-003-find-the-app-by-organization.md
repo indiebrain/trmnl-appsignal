@@ -17,6 +17,10 @@ publishing checklist, which includes the TRMNL X in portrait.
 - THEN the screen shows AppSignal's "Object not found." and suggests checking
   the name or connecting again
 
+- GIVEN the organization name `demo`, in any case or with spaces around it
+- WHEN TRMNL refreshes it
+- THEN the screen shows built-in example data, whatever AppSignal answers
+
 - GIVEN a TRMNL X in portrait
 - WHEN any view is drawn
 - THEN nothing is cut off or runs past the edge; the full view shows the error
@@ -59,6 +63,11 @@ publishing checklist, which includes the TRMNL X in portrait.
 - Long names get a zero-width space after `::` and `#`. A one-line clamp cannot
   shorten a single unbroken word, so these names ran past the column edge. The
   `#` replacement runs first so it does not hit the `#` inside `&#8203;`.
+- Demo mode keyed on the organization name. TRMNL draws the marketplace
+  picture from the owner's own plugin, which would publish the owner's app and
+  incidents. Rejected: a separate demo setting, which adds a field every
+  installer has to read past. The example data lives in `shared.liquid` with
+  times as offsets from now, so it never looks stale.
 
 ## Date
 2026-10-24

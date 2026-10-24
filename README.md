@@ -34,6 +34,9 @@ only read, belongs to one organization, and can be revoked on its own.
    and add the plugin to your playlist. The screen shows the first app in the
    organization that the token can read.
 
+Enter `demo` as the organization to see example data without connecting. Use it
+when generating the marketplace picture, so it does not show your own app.
+
 ## OAuth clients
 
 AppSignal registers OAuth clients automatically, but accepts one callback

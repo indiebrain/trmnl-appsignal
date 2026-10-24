@@ -2,9 +2,46 @@
   Shared by every layout. The polled GraphQL response arrives as `data`
   (or `errors` when AppSignal rejects the request).
 {% endcomment %}
-{% comment %} Shows the first app. Connecting asks the user to pick an app, which should leave only that one in the list. {% endcomment %}
-{% assign app = data.organization.apps | first %}
 {% assign now_seconds = "now" | date: "%s" | plus: 0 %}
+{% assign organization = trmnl.plugin_settings.custom_fields_values.organization | default: "" | strip | downcase %}
+
+{% if organization == "demo" %}
+  {% comment %}
+    Example data for the marketplace picture and for trying the plugin out.
+    Times are offsets from now, so the screen always looks recent.
+  {% endcomment %}
+  {% capture demo_json %}
+  {"apps": [{
+    "name": "example-app", "environment": "production",
+    "openExceptions": [{"number": 412}, {"number": 409}, {"number": 398}, {"number": 377}, {"number": 351}, {"number": 344}, {"number": 310}],
+    "openPerformance": [{"number": 405}, {"number": 388}, {"number": 362}],
+    "exceptionIncidents": [
+      {"number": 412, "count": 1843, "lastOccurredAt": "{{ now_seconds | minus: 240 }}", "exceptionName": "ActiveRecord::RecordNotFound", "exceptionMessage": "Couldn't find Shift with 'id'=88123", "namespace": "web", "actionNames": ["ShiftsController#show"]},
+      {"number": 409, "count": 312, "lastOccurredAt": "{{ now_seconds | minus: 2340 }}", "exceptionName": "Net::ReadTimeout", "exceptionMessage": "Net::ReadTimeout with #<TCPSocket:(closed)>", "namespace": "background", "actionNames": ["SyncCalendarJob#perform"]},
+      {"number": 398, "count": 57, "lastOccurredAt": "{{ now_seconds | minus: 14280 }}", "exceptionName": "NoMethodError", "exceptionMessage": "private method 'email' called for nil", "namespace": "web", "actionNames": ["RostersController#export"]},
+      {"number": 377, "count": 21, "lastOccurredAt": "{{ now_seconds | minus: 69600 }}", "exceptionName": "Redis::CannotConnectError", "exceptionMessage": "Error connecting to Redis on 10.0.0.12:6379 (Errno::ECONNREFUSED)", "namespace": "background", "actionNames": ["ReminderMailerJob#perform"]},
+      {"number": 351, "count": 9, "lastOccurredAt": "{{ now_seconds | minus: 197100 }}", "exceptionName": "ActionController::InvalidAuthenticityToken", "exceptionMessage": "Can't verify CSRF token authenticity.", "namespace": "web", "actionNames": ["SessionsController#create"]},
+      {"number": 344, "count": 4, "lastOccurredAt": "{{ now_seconds | minus: 325620 }}", "exceptionName": "JSON::ParserError", "exceptionMessage": "unexpected token at '<html>'", "namespace": "background", "actionNames": ["ImportHolidaysJob#perform"]},
+      {"number": 310, "count": 2, "lastOccurredAt": "{{ now_seconds | minus: 982800 }}", "exceptionName": "ArgumentError", "exceptionMessage": "invalid date", "namespace": "web", "actionNames": ["ReportsController#index"]}
+    ],
+    "performanceIncidents": [
+      {"number": 405, "count": 940, "lastOccurredAt": "{{ now_seconds | minus: 600 }}", "namespace": "web", "actionNames": ["RostersController#index"], "mean": 2381.4, "hasNPlusOne": true},
+      {"number": 388, "count": 120, "lastOccurredAt": "{{ now_seconds | minus: 20880 }}", "namespace": "background", "actionNames": ["NightlyDigestJob#perform"], "mean": 18450.2, "hasNPlusOne": false},
+      {"number": 362, "count": 33, "lastOccurredAt": "{{ now_seconds | minus: 249300 }}", "namespace": "web", "actionNames": ["Api::ShiftsController#update"], "mean": 812.9, "hasNPlusOne": false}
+    ],
+    "uptimeMonitors": [
+      {"name": "Homepage", "alerts": [{"state": "CLOSED"}]},
+      {"name": "API", "alerts": [{"state": "OPEN"}, {"state": "CLOSED"}]},
+      {"name": "Status", "alerts": []}
+    ]
+  }]}
+  {% endcapture %}
+  {% assign demo = demo_json | parse_json %}
+  {% assign app = demo.apps | first %}
+{% else %}
+  {% comment %} Shows the first app. Connecting asks the user to pick an app, which should leave only that one in the list. {% endcomment %}
+  {% assign app = data.organization.apps | first %}
+{% endif %}
 
 {% assign open_exception_count = app.openExceptions | size %}
 {% assign open_performance_count = app.openPerformance | size %}
