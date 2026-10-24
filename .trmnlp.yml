@@ -7,9 +7,8 @@ watch:
   - src
 
 # Values of the custom fields defined in src/settings.yml, read from the
-# environment so the token stays out of version control.
+# environment so the app ID stays out of version control.
 custom_fields:
-  api_token: "{{ env.APPSIGNAL_API_TOKEN }}"
   app_id: "{{ env.APPSIGNAL_APP_ID }}"
 
 time_zone: America/New_York

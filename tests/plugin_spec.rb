@@ -8,7 +8,7 @@ RSpec.describe 'AppSignal' do
   let(:now) { '2026-10-23T15:00:00Z' }
   let(:response) { JSON.parse(File.read(File.join(__dir__, 'fixtures/appsignal_response.json'))) }
   let(:mocks) { { 'https://appsignal.com/graphql*' => { json: response } } }
-  let(:custom_fields) { { 'api_token' => 'test-token', 'app_id' => '5f0c3a9e8b1d2c4e6a7f9b10' } }
+  let(:custom_fields) { { 'app_id' => '5f0c3a9e8b1d2c4e6a7f9b10' } }
 
   it_behaves_like 'a publishable recipe'
 

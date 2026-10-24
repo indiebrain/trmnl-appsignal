@@ -1,5 +1,8 @@
 # CIR-001: Poll AppSignal's GraphQL API directly from TRMNL
 
+Status: Superseded by CIR-002 (the plugin now signs in with read-only OAuth
+instead of a personal API token).
+
 ## Intent
 Show an AppSignal app's health on a TRMNL X without running any service of our
 own.

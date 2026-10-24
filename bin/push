@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Upload the plugin to TRMNL, then restore src/settings.yml.
+#
+# `trmnlp push` overwrites src/settings.yml with the copy the TRMNL service
+# returns, which leaves out the polling headers and body (and adds this
+# account's plugin ID). Restoring the file keeps the working query in version
+# control and the account-specific ID out of it. It restores from a copy taken
+# before the push, so uncommitted edits survive.
+#
+# Needs TRMNL_API_KEY and TRMNL_PLUGIN_ID, for example from mise.local.toml.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+: "${TRMNL_API_KEY:?Set TRMNL_API_KEY (your TRMNL account API key)}"
+: "${TRMNL_PLUGIN_ID:?Set TRMNL_PLUGIN_ID (the number in the plugin settings address)}"
+
+backup="$(mktemp)"
+cp src/settings.yml "$backup"
+trap 'mv "$backup" src/settings.yml' EXIT
+trmnlp push --force --id "$TRMNL_PLUGIN_ID"
