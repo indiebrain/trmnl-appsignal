@@ -9,7 +9,7 @@ polling_url: https://appsignal.com/graphql
 polling_headers: |-
   Content-Type: application/json
   Authorization: Bearer {{ oauth_access_token }}
-polling_body: '{"query":"query TrmnlAppsignal($organization: String!) { organization(slug: $organization) { apps { name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } } }","variables":{"organization":"{{ organization }}"}}'
+polling_body: '{"query":"query TrmnlAppsignal($organization: String!) { organization(slug: $organization) { apps { name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } } }","variables":{"organization":{{ organization | json }}}}'
 name: AppSignal
 description: Open AppSignal incidents
 refresh_interval: 15
