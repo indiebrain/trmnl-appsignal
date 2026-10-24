@@ -2,6 +2,7 @@
 # AppSignal organization) go in mise.local.toml, which git ignores.
 [tools]
 ruby = "4.0"
+"gem:trmnl_preview" = "0.32.3"
 
 [env]
 # Public AppSignal OAuth client for `trmnlp serve`; its only callback is

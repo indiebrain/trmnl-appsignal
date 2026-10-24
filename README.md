@@ -17,7 +17,7 @@ only read, belongs to one organization, and can be revoked on its own.
 
 ## Setup
 
-1. Install the TRMNL preview tool: `gem install trmnl_preview` (Ruby 4.0).
+1. Install Ruby and the TRMNL preview tool (`trmnlp`) with `mise install`.
 2. Create the plugin in your TRMNL account with your TRMNL account API key
    (from trmnl.com/account). The push prints the plugin settings address; the
    number at its end is the plugin ID.
