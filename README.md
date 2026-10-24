@@ -111,5 +111,5 @@ TRMNL X in portrait, and compare against the pictures in `tests/snapshots/`.
   app should leave only that app in the organization list. This is untested with
   an organization that has several apps; until then the screen shows the first
   app the token can read.
-- A wrong organization name gets the same "could not be authenticated" answer
-  as an expired connection, so the error screen suggests checking both.
+- A blank or wrong organization name shows AppSignal's "Object not found." An
+  expired or revoked connection shows "Request could not be authenticated."

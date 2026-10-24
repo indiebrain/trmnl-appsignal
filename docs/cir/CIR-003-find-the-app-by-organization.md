@@ -14,8 +14,8 @@ publishing checklist, which includes the TRMNL X in portrait.
 
 - GIVEN a wrong organization name
 - WHEN TRMNL refreshes it
-- THEN the screen shows AppSignal's "could not be authenticated" message and
-  suggests checking the name or connecting again
+- THEN the screen shows AppSignal's "Object not found." and suggests checking
+  the name or connecting again
 
 - GIVEN a TRMNL X in portrait
 - WHEN any view is drawn
@@ -37,8 +37,9 @@ publishing checklist, which includes the TRMNL X in portrait.
   user's organizations or apps on its own.
 - `organization(slug:)` requires the slug, and AppSignal's token response
   carries no organization or app.
-- AppSignal answers a wrong organization name with the same 401 as a bad
-  token.
+- AppSignal answers a blank or wrong organization name with "Object not
+  found." and an expired token with a 401 "Request could not be
+  authenticated.", so the error screen passes the message through.
 - The preview tool's tests do not pass the device orientation to the
   templates, so portrait handling has to use the framework's `portrait:`
   classes, which the real device and the tests both apply.
