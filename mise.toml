@@ -1,0 +1,9 @@
+# Shared development settings. Personal values (TRMNL account key, plugin ID,
+# AppSignal organization) go in mise.local.toml, which git ignores.
+[tools]
+ruby = "4.0"
+
+[env]
+# Public AppSignal OAuth client for `trmnlp serve`; its only callback is
+# http://localhost:4567/oauth/callback.
+TRMNL_OAUTH_CLIENT_ID = "nUr-tu_3pJcoct2D0XoWZWsGPPNATOdTtjBjEXT6Jrk"

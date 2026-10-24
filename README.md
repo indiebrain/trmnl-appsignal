@@ -79,13 +79,22 @@ bin/push
 
 ## Local development
 
-Keep these values in a `mise.local.toml`, which git ignores, or export them:
+`mise.toml` sets the Ruby version and the local OAuth client ID. Put your own
+values in a `mise.local.toml`, which git ignores:
+
+```toml
+[env]
+APPSIGNAL_ORGANIZATION = "your-org"   # read by .trmnlp.yml; "demo" works too
+TRMNL_API_KEY = "user_..."            # for bin/push
+TRMNL_PLUGIN_ID = "123456"            # for bin/push
+```
+
+Then:
 
 ```sh
-export APPSIGNAL_ORGANIZATION=...                                 # read by .trmnlp.yml
-export TRMNL_OAUTH_CLIENT_ID=nUr-tu_3pJcoct2D0XoWZWsGPPNATOdTtjBjEXT6Jrk
-trmnlp serve      # preview at http://localhost:4567; click "Connect account" once
-trmnlp lint
+mise install
+mise exec -- trmnlp serve   # preview at http://localhost:4567; click "Connect account" once
+mise exec -- trmnlp lint
 ```
 
 The preview tool and TRMNL disagree on how to switch on PKCE (the extra check
