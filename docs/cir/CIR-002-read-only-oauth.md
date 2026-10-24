@@ -27,8 +27,9 @@ the AppSignal account.
 - AppSignal registers OAuth clients without approval but accepts one callback
   address per client, and returns an existing client when the callbacks match
   one it already has.
-- TRMNL keeps the OAuth client ID from the first upload and leaves client
-  credentials, polling headers, and the polling body out of exports.
+- Uploads do not set the OAuth client ID on TRMNL; it is entered once in the
+  plugin's OAuth settings. TRMNL leaves client credentials, polling headers,
+  and the polling body out of exports.
 
 ## Decisions
 - OAuth with the `app:read` scope replaces the personal API token, which could

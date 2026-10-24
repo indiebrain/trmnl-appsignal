@@ -61,8 +61,9 @@ curl -X POST https://appsignal.com/oauth/register \
        "scope": "app:read"}'
 ```
 
-TRMNL keeps the client ID from the plugin's first upload. To change it later,
-edit it in the plugin's settings page on TRMNL.
+Uploads do not set the client ID on TRMNL. Paste it once into the plugin's
+OAuth settings on TRMNL (leave the client secret empty), and later uploads leave
+it alone.
 
 ## Pushing changes
 
