@@ -7,16 +7,12 @@ watch:
   - src
 
 # Values of the custom fields defined in src/settings.yml, read from the
-# environment so the app ID stays out of version control.
+# environment so the organization name stays out of version control.
 custom_fields:
-  app_id: "{{ env.APPSIGNAL_APP_ID }}"
+  organization: "{{ env.APPSIGNAL_ORGANIZATION }}"
 
 time_zone: America/New_York
 
 # override variables
 variables:
   trmnl: {}
-
-# A private plugin, so no author contact is needed.
-ignored_lint_rules:
-  - author_contact_method

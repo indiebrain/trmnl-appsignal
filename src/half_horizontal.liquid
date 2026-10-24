@@ -1,15 +1,15 @@
 {% if app %}
-<div class="layout gap--base">
-  <div class="flex flex--col gap--small">
+<div class="layout portrait:layout--col gap--base">
+  <div class="flex flex--col portrait:flex--row gap--small">
     <div class="item">
       <div class="content">
-        <span class="value value--large lg:value--xxxlarge value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+        <span class="value value--large lg:value--xxxlarge lg:portrait:value--xxlarge value--tnums">{% render "capped_count", count: open_exception_count %}</span>
         <span class="label lg:label--xlarge">Open errors</span>
       </div>
     </div>
     <div class="item">
       <div class="content">
-        <span class="value value--large lg:value--xxxlarge value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+        <span class="value value--large lg:value--xxxlarge lg:portrait:value--xxlarge value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
         <span class="label lg:label--xlarge">Monitors down</span>
       </div>
     </div>

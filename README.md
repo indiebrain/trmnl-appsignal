@@ -6,7 +6,7 @@ the original TRMNL.
 
 | View | Shows |
 |------|-------|
-| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues |
+| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues (errors only in portrait) |
 | Half (either way) | Open error count, monitors down, latest errors |
 | Quadrant | Open error count with a one-line summary |
 
@@ -27,12 +27,12 @@ only read, belongs to one organization, and can be revoked on its own.
    git checkout -- src/settings.yml   # see "Pushing changes" below
    ```
 
-3. In TRMNL, open the plugin, click **Connect with OAuth**, and approve read
-   access in AppSignal. If AppSignal offers an app picker, choose only the app
-   you want on the screen.
-4. Fill in the app ID, which is in the app's settings page or the address bar
-   (`appsignal.com/<organization>/sites/<app ID>`), and add the plugin to your
-   playlist.
+3. In TRMNL, open the plugin, click **Connect with OAuth**, approve read
+   access in AppSignal, and pick the app you want on the screen.
+4. Fill in the organization name, which is the part after `appsignal.com/` in
+   the address bar when you open AppSignal (`appsignal.com/<organization>/...`),
+   and add the plugin to your playlist. The screen shows the first app in the
+   organization that the token can read.
 
 ## OAuth clients
 
@@ -79,11 +79,18 @@ bin/push
 Keep these values in a `mise.local.toml`, which git ignores, or export them:
 
 ```sh
-export APPSIGNAL_APP_ID=...                                       # read by .trmnlp.yml
+export APPSIGNAL_ORGANIZATION=...                                 # read by .trmnlp.yml
 export TRMNL_OAUTH_CLIENT_ID=nUr-tu_3pJcoct2D0XoWZWsGPPNATOdTtjBjEXT6Jrk
 trmnlp serve      # preview at http://localhost:4567; click "Connect account" once
 trmnlp lint
 ```
+
+The preview tool and TRMNL disagree on how to switch on PKCE (the extra check
+AppSignal needs for clients without a secret): TRMNL keeps only
+`oauth_pkce_enabled: 'yes'`, and `trmnlp serve` accepts only `'true'`, hiding
+the **Connect account** banner otherwise. To connect locally, change it to
+`'true'` until the banner says connected, then change it back before pushing.
+The preview keeps the token after that.
 
 The tests need Firefox and ImageMagick, so run them in Docker:
 
@@ -92,13 +99,17 @@ docker run --rm -v "$PWD":/plugin trmnl/trmnlp test
 docker run --rm -v "$PWD":/plugin trmnl/trmnlp test --update   # re-record snapshots
 ```
 
-They render every view against a canned response (`tests/fixtures/`), on both
-the original TRMNL (`og_plus`) and the TRMNL X (`v2`), and compare against the
-pictures in `tests/snapshots/`.
+They render every view against a canned response (`tests/fixtures/`) on the
+original TRMNL (`og_plus`) and the TRMNL X (`v2`), in landscape and on the
+TRMNL X in portrait, and compare against the pictures in `tests/snapshots/`.
 
 ## Limits
 
 - Counts stop at 100 per incident type and show as "99+" beyond that.
 - A monitor counts as down when it has an alert in the `OPEN` state.
-- The `app:read` token can read every app in the organization you approve,
-  unless AppSignal's approval screen lets you narrow it to one app.
+- AppSignal asks which app to allow when you connect. A token limited to that
+  app should leave only that app in the organization list. This is untested with
+  an organization that has several apps; until then the screen shows the first
+  app the token can read.
+- A wrong organization name gets the same "could not be authenticated" answer
+  as an expired connection, so the error screen suggests checking both.

@@ -9,23 +9,28 @@ polling_url: https://appsignal.com/graphql
 polling_headers: |-
   Content-Type: application/json
   Authorization: Bearer {{ oauth_access_token }}
-polling_body: '{"query":"query TrmnlAppsignal($appId: String!) { app(id: $appId) {
-  id name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100)
-  { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number
-  } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt
-  exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state:
-  OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames
-  severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } }","variables":{"appId":"{{
-  app_id }}"}}'
+polling_body: '{"query":"query TrmnlAppsignal($organization: String!) { organization(slug: $organization) { apps { name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } } }","variables":{"organization":"{{ organization }}"}}'
 name: AppSignal
 description: Open AppSignal incidents
 refresh_interval: 15
 custom_fields:
-- keyname: app_id
-  name: App ID
+- keyname: about
+  name: About This Plugin
+  field_type: author_bio
+  category: analytics,programming
+  description: >-
+    Shows an AppSignal app's open errors, slow actions, and uptime monitors.<br/>
+    <br/>
+    <strong>Setup</strong><br/>
+    1. Click the OAuth <strong>Connect</strong> button and sign in to AppSignal. When asked, pick the app to show. The plugin only asks for read access, which you can revoke in AppSignal at any time.<br/>
+    2. Fill in your organization name: the part after appsignal.com/ in the address bar when you open AppSignal.<br/>
+    3. Save, and add the plugin to a playlist.
+  github_url: https://github.com/indiebrain/trmnl-appsignal
+- keyname: organization
+  name: Organization
   field_type: string
-  description: The ID from the app's settings page, or from the address bar (appsignal.com/your-org/sites/APP_ID).
-  placeholder: 5f0c3a9e8b1d2c4e6a7f9b10
+  description: The name after appsignal.com/ in the address bar when you open AppSignal (appsignal.com/ORGANIZATION/...).
+  placeholder: example-org
 oauth_enabled: 'true'
 oauth_authorize_url: https://appsignal.com/oauth/authorize
 oauth_token_url: https://appsignal.com/oauth/token

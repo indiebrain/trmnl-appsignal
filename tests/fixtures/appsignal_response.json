@@ -1,7 +1,7 @@
 {
   "data": {
-    "app": {
-      "id": "5f0c3a9e8b1d2c4e6a7f9b10",
+    "organization": {
+      "apps": [{
       "name": "example-app",
       "environment": "production",
       "openExceptions": [{"number": 412}, {"number": 409}, {"number": 398}, {"number": 377}, {"number": 351}, {"number": 344}, {"number": 310}],
@@ -25,6 +25,7 @@
         {"name": "API", "url": "https://example-app.example.com/api/health", "alerts": [{"state": "OPEN"}, {"state": "CLOSED"}]},
         {"name": "Status", "url": "https://example-app.example.com/up", "alerts": []}
       ]
+    }]
     }
   }
 }
