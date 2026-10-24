@@ -92,11 +92,13 @@ the **Connect account** banner otherwise. To connect locally, change it to
 `'true'` until the banner says connected, then change it back before pushing.
 The preview keeps the token after that.
 
-The tests need Firefox and ImageMagick, so run them in Docker:
+The tests need Firefox and ImageMagick, so run them in Docker. Use the Intel
+image even on an ARM Mac: fonts draw a pixel differently on ARM, and the
+pictures must match the ones GitHub Actions draws.
 
 ```sh
-docker run --rm -v "$PWD":/plugin trmnl/trmnlp test
-docker run --rm -v "$PWD":/plugin trmnl/trmnlp test --update   # re-record snapshots
+docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp test
+docker run --rm --platform linux/amd64 -v "$PWD":/plugin trmnl/trmnlp test --update   # re-record snapshots
 ```
 
 They render every view against a canned response (`tests/fixtures/`) on the
