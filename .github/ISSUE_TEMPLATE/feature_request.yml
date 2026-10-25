@@ -1,0 +1,16 @@
+name: Idea
+description: Suggest something the plugin could show or do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you want to know at a glance
+      description: The question the screen should answer, and why it matters to you.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How the plugin could show it, and on which device and view.

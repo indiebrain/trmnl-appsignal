@@ -1,0 +1,47 @@
+name: Bug report
+description: The screen shows something wrong, or nothing at all.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Leave out tokens and any organization or app names you would rather keep
+        private. If you can, enter demo as the organization and check whether the
+        problem still happens with example data. Report security problems through
+        the Security tab, not here.
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options: [TRMNL X, Original TRMNL, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: view
+    attributes:
+      label: View
+      options: [Full, Half horizontal, Half vertical, Quadrant]
+      multiple: true
+    validations:
+      required: true
+  - type: dropdown
+    id: orientation
+    attributes:
+      label: Orientation
+      options: [Landscape, Portrait]
+    validations:
+      required: true
+  - type: dropdown
+    id: demo
+    attributes:
+      label: Does it happen with the demo organization?
+      options: ["Yes", "No", "Did not try"]
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What the screen shows, and what you expected. A photo or screenshot helps.
+    validations:
+      required: true
