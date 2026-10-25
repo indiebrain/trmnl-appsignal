@@ -25,7 +25,8 @@ only read, belongs to one organization, and can be revoked on its own.
 2. On the plugin's settings page, paste
    `SSxE-b54Nak88428BadY9JQeDS0sck3JGgycXSIL2ho` into **OAuth Client ID**,
    leave **OAuth Client Secret** empty, and save. TRMNL does not copy the
-   client ID when it installs a recipe.
+   client ID when it installs a recipe. To use your own client instead, see
+   [Using your own OAuth client](#using-your-own-oauth-client).
 3. Click **Connect with OAuth**, approve read access in AppSignal, and pick
    the app you want on the screen.
 4. Fill in the organization name, which is the part after `appsignal.com/` in
@@ -33,6 +34,27 @@ only read, belongs to one organization, and can be revoked on its own.
 5. Save, and add the plugin to a playlist.
 
 Enter `demo` as the organization to see example data without connecting.
+
+### Using your own OAuth client
+
+Every install that pastes the client ID above shares one AppSignal OAuth client.
+If AppSignal rate-limits or revokes that client, every one of those installs
+stops refreshing at once. To keep yours independent, register your own client
+and paste its ID in step 2 instead:
+
+```sh
+curl -X POST https://appsignal.com/oauth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"client_name": "TRMNL AppSignal display",
+       "redirect_uris": ["https://trmnl.com/plugin_settings/private_plugin/oauth/redirect"],
+       "grant_types": ["authorization_code", "refresh_token"],
+       "response_types": ["code"],
+       "token_endpoint_auth_method": "none",
+       "scope": "app:read"}'
+```
+
+The `client_id` in the response is the ID to paste. It needs no secret, and
+nothing else about the plugin changes.
 
 ## What installers trust
 

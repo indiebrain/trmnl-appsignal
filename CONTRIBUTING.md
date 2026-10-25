@@ -139,6 +139,21 @@ curl -X POST https://appsignal.com/oauth/register \
        "scope": "app:read"}'
 ```
 
+### If AppSignal revokes the TRMNL client
+
+Installs that use the TRMNL client ID above stop refreshing and show "Request
+could not be authenticated." Installs with their own client keep working. To
+recover:
+
+1. Register a new client with the command above, using the TRMNL callback.
+2. Replace the old ID everywhere it appears (`git grep <old client ID>`): the
+   `oauth_client_id` and setup steps in `src/settings.yml`, the README install
+   steps, and the table above.
+3. Push with `bin/push`, then paste the new ID into your own plugin's OAuth
+   settings on TRMNL, since uploads do not set it.
+4. Tell installers to paste the new ID and connect again: open a pinned GitHub
+   issue, and say so at the top of the About text in `src/settings.yml`.
+
 ## License
 
 By contributing, you agree that your contributions are licensed under the
