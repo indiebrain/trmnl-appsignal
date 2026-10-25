@@ -22,9 +22,10 @@ custom_fields:
     Shows an AppSignal app's open errors, slow actions, and uptime monitors.<br/>
     <br/>
     <strong>Setup</strong><br/>
-    1. Click the OAuth <strong>Connect</strong> button and sign in to AppSignal. When asked, pick the app to show. The plugin only asks for read access, which you can revoke in AppSignal at any time.<br/>
-    2. Fill in your organization name: the part after appsignal.com/ in the address bar when you open AppSignal.<br/>
-    3. Save, and add the plugin to a playlist.<br/>
+    1. Paste <strong>SSxE-b54Nak88428BadY9JQeDS0sck3JGgycXSIL2ho</strong> into OAuth Client ID below, leave OAuth Client Secret empty, and save. TRMNL does not copy the client ID when you install a recipe.<br/>
+    2. Click the OAuth <strong>Connect</strong> button and sign in to AppSignal. When asked, pick the app to show. The plugin only asks for read access, which you can revoke in AppSignal at any time.<br/>
+    3. Fill in your organization name: the part after appsignal.com/ in the address bar when you open AppSignal.<br/>
+    4. Save, and add the plugin to a playlist.<br/>
     <br/>
     To see example data without connecting, enter <strong>demo</strong> as the organization.
   github_url: https://github.com/indiebrain/trmnl-appsignal

@@ -22,11 +22,15 @@ only read, belongs to one organization, and can be revoked on its own.
 1. Open the [AppSignal recipe](https://trmnl.com/recipes/appsignal-518240) on
    TRMNL and click **Install**, or **Fork** to take a copy that does not receive
    updates (see below).
-2. On the plugin's settings page, click **Connect with OAuth**, approve read
-   access in AppSignal, and pick the app you want on the screen.
-3. Fill in the organization name, which is the part after `appsignal.com/` in
+2. On the plugin's settings page, paste
+   `SSxE-b54Nak88428BadY9JQeDS0sck3JGgycXSIL2ho` into **OAuth Client ID**,
+   leave **OAuth Client Secret** empty, and save. TRMNL does not copy the
+   client ID when it installs a recipe.
+3. Click **Connect with OAuth**, approve read access in AppSignal, and pick
+   the app you want on the screen.
+4. Fill in the organization name, which is the part after `appsignal.com/` in
    the address bar when you open AppSignal (`appsignal.com/<organization>/...`).
-4. Save, and add the plugin to a playlist.
+5. Save, and add the plugin to a playlist.
 
 Enter `demo` as the organization to see example data without connecting.
 
