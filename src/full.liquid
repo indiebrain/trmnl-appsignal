@@ -38,6 +38,28 @@
         <span class="description lg:description--xlarge">No open performance issues.</span>
       {% endfor %}
     </div>
+    {% comment %}
+      Monitors that are down come first, so the overflow counter hides only healthy ones.
+      Only the TRMNL X in landscape is wide enough for a third column.
+    {% endcomment %}
+    <div class="column hidden lg:flex lg:portrait:hidden" data-overflow="true" data-overflow-counter="true">
+      <span class="label label--underline lg:label--xlarge">Monitors</span>
+      {% for monitor in app.uptimeMonitors %}
+        {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
+        {% if open_alerts.size > 0 %}{% render "uptime_item", monitor: monitor, down: true %}{% endif %}
+      {% endfor %}
+      {% for check_in in app.checkIns.triggers %}
+        {% if check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% render "check_in_item", check_in: check_in, now: now_seconds %}{% endif %}
+      {% endfor %}
+      {% for monitor in app.uptimeMonitors %}
+        {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
+        {% if open_alerts.size == 0 %}{% render "uptime_item", monitor: monitor, down: false %}{% endif %}
+      {% endfor %}
+      {% for check_in in app.checkIns.triggers %}
+        {% unless check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% render "check_in_item", check_in: check_in, now: now_seconds %}{% endunless %}
+      {% endfor %}
+      {% if monitor_count == 0 %}<span class="description lg:description--xlarge">No monitors.</span>{% endif %}
+    </div>
   </div>
 </div>
 {% else %}

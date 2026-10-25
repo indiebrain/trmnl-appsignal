@@ -8,7 +8,7 @@ the original TRMNL.
 
 | View | Shows |
 |------|-------|
-| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues (errors only in portrait) |
+| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues, and every monitor with its status (TRMNL X in landscape; errors only in portrait) |
 | Half (either way) | Open error count, monitors down, latest errors |
 | Quadrant | Open error count with a one-line summary, plus the latest error on the TRMNL X |
 
@@ -72,7 +72,10 @@ read, and only what its installer approved. To limit this:
 ## Limits
 
 - Counts stop at 100 per incident type and show as "99+" beyond that.
-- A monitor counts as down when it has an alert in the `OPEN` state.
+- Monitors are the app's uptime monitors and check-in monitors (cron and
+  heartbeat). An uptime monitor counts as down when it has an alert in the
+  `OPEN` state; a check-in monitor counts as down when its latest run was
+  missed or late.
 - AppSignal asks which app to allow when you connect. A token limited to that
   app should leave only that app in the organization list. This is untested with
   an organization that has several apps; until then the screen shows the first

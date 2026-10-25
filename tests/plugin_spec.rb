@@ -47,7 +47,16 @@ RSpec.describe 'AppSignal' do
 
     expect(screen.result.html).to include('ActiveRecord::&#8203;RecordNotFound')
     expect(screen.result.html).to include('4m ago')
-    expect(screen.result.html).to match(%r{1<span[^>]*>/3</span>})
+    expect(screen.result.html).to match(%r{2<span[^>]*>/6</span>})
+  end
+
+  it 'lists monitors in the full view, those that are down first' do
+    html = trmnl.render(view: 'full', mocks:, custom_fields:, now:).result.html
+    names = html.scan(/>(Homepage|API|Status|nightly-backup|invoice-sync|queue-worker)</).flatten
+
+    expect(names).to eq(%w[API invoice-sync Homepage Status nightly-backup queue-worker])
+    expect(html).to include('Missed')
+    expect(html).to include('1h ago')
   end
 
   it 'lets long action names break after :: and # without mangling them' do

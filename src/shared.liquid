@@ -32,8 +32,13 @@
     "uptimeMonitors": [
       {"name": "Homepage", "alerts": [{"state": "CLOSED"}]},
       {"name": "API", "alerts": [{"state": "OPEN"}, {"state": "CLOSED"}]},
-      {"name": "Status", "alerts": []}
-    ]
+  {"name": "Status", "alerts": []}
+],
+"checkIns": {"triggers": [
+  {"identifier": "nightly-backup", "kind": "CRON", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 19800 }}"},
+  {"identifier": "invoice-sync", "kind": "CRON", "lastState": "MISSED", "lastUpdateAt": "{{ now_seconds | minus: 5400 }}"},
+  {"identifier": "queue-worker", "kind": "HEARTBEAT", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 120 }}"}
+]}
   }]}
   {% endcapture %}
   {% assign demo = demo_json | parse_json %}
@@ -51,7 +56,13 @@
   {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
   {% if open_alerts.size > 0 %}{% assign monitors_down = monitors_down | plus: 1 %}{% endif %}
 {% endfor %}
-{% assign monitor_count = app.uptimeMonitors | size %}
+{% comment %} A check-in monitor is down when its latest run was missed or late. {% endcomment %}
+{% for check_in in app.checkIns.triggers %}
+  {% if check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% assign monitors_down = monitors_down | plus: 1 %}{% endif %}
+{% endfor %}
+{% assign uptime_count = app.uptimeMonitors | size %}
+{% assign check_in_count = app.checkIns.triggers | size %}
+{% assign monitor_count = uptime_count | plus: check_in_count %}
 
 {% template capped_count %}{% if count >= 100 %}99+{% else %}{{ count }}{% endif %}{% endtemplate %}
 
@@ -68,7 +79,7 @@
   <div class="content">
     <span class="title title--small lg:title--large" data-clamp="1">{{ incident.exceptionName | default: "Unknown error" | escape | replace: "::", "::&#8203;" }}</span>
     {% if detailed %}<span class="description lg:description--xlarge" data-clamp="1">{{ incident.exceptionMessage | escape }}</span>{% endif %}
-    <div class="flex gap--small">
+    <div class="flex flex--wrap gap--small">
       <span class="label label--small lg:label--large">#{{ incident.number }}</span>
       <span class="label label--small lg:label--large label--underline">{{ incident.count | number_with_delimiter }}x</span>
       <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
@@ -83,11 +94,45 @@
   <div class="meta"></div>
   <div class="content">
     <span class="title title--small lg:title--large" data-clamp="1">{{ incident.actionNames | first | default: incident.namespace | escape | replace: "#", "#&#8203;" | replace: "::", "::&#8203;" }}</span>
-    <div class="flex gap--small">
+    <div class="flex flex--wrap gap--small">
       <span class="label label--small lg:label--large">#{{ incident.number }}</span>
       <span class="label label--small lg:label--large label--underline">{{ incident.mean | round }}ms mean</span>
       <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
       {% if incident.hasNPlusOne %}<span class="label label--small lg:label--large label--inverted">N+1</span>{% endif %}
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
+{% template uptime_item %}
+<div class="item">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="title title--small lg:title--large" data-clamp="1">{{ monitor.name | escape }}</span>
+    <div class="flex flex--wrap gap--small">
+      {% if down %}<span class="label label--small lg:label--large label--inverted">Down</span>{% else %}<span class="label label--small lg:label--large">Up</span>{% endif %}
+      <span class="label label--small lg:label--large label--gray 1bit:text--black">Uptime</span>
+    </div>
+  </div>
+</div>
+{% endtemplate %}
+
+{% template check_in_item %}
+<div class="item">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="title title--small lg:title--large" data-clamp="1">{{ check_in.identifier | escape }}</span>
+    <div class="flex flex--wrap gap--small">
+      {% case check_in.lastState %}
+        {% when "FINISHED" %}<span class="label label--small lg:label--large">OK</span>
+        {% when "STARTED" %}<span class="label label--small lg:label--large">Running</span>
+        {% when "NEW" %}<span class="label label--small lg:label--large">Waiting</span>
+        {% when "MISSED" %}<span class="label label--small lg:label--large label--inverted">Missed</span>
+        {% when "LATE" %}<span class="label label--small lg:label--large label--inverted">Late</span>
+        {% else %}<span class="label label--small lg:label--large">Unexpected</span>
+      {% endcase %}
+      <span class="label label--small lg:label--large label--gray 1bit:text--black">{% if check_in.kind == "HEARTBEAT" %}Heartbeat{% else %}Cron{% endif %}</span>
+      {% if check_in.lastUpdateAt %}<span class="label label--small lg:label--large">{% assign at = check_in.lastUpdateAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>{% endif %}
     </div>
   </div>
 </div>

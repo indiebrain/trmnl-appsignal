@@ -9,7 +9,7 @@ polling_url: https://appsignal.com/graphql
 polling_headers: |-
   Content-Type: application/json
   Authorization: Bearer {{ oauth_access_token }}
-polling_body: '{"query":"query TrmnlAppsignal($organization: String!) { organization(slug: $organization) { apps { name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } } } }","variables":{"organization":{{ organization | json }}}}'
+polling_body: '{"query":"query TrmnlAppsignal($organization: String!) { organization(slug: $organization) { apps { name environment openExceptions: exceptionIncidents(state: OPEN, limit: 100) { number } openPerformance: performanceIncidents(state: OPEN, limit: 100) { number } exceptionIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt exceptionName exceptionMessage namespace actionNames severity } performanceIncidents(state: OPEN, limit: 8, order: LAST) { number count lastOccurredAt namespace actionNames severity mean hasNPlusOne } uptimeMonitors { name url alerts { state } } checkIns { triggers { identifier kind lastState lastUpdateAt } } } } }","variables":{"organization":{{ organization | json }}}}'
 name: AppSignal
 description: Open AppSignal incidents
 refresh_interval: 15
@@ -19,7 +19,7 @@ custom_fields:
   field_type: author_bio
   category: analytics,programming
   description: >-
-    Shows an AppSignal app's open errors, slow actions, and uptime monitors.<br/>
+    Shows an AppSignal app's open errors, slow actions, and its uptime and check-in monitors.<br/>
     <br/>
     <strong>Setup</strong><br/>
     1. Paste <strong>SSxE-b54Nak88428BadY9JQeDS0sck3JGgycXSIL2ho</strong> into OAuth Client ID below, leave OAuth Client Secret empty, and save. TRMNL does not copy the client ID when you install a recipe.<br/>
