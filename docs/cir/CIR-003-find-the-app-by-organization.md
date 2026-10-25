@@ -1,5 +1,9 @@
 # CIR-003: Find the app by organization name, and lay out for portrait
 
+Status: Partly superseded by CIR-005. Picking an app when connecting does not
+limit the token to that app; the plugin shows every app, or the one named in
+its App setting.
+
 ## Intent
 Make installation simple enough to share the plugin as a TRMNL recipe: an
 installer connects AppSignal and types one short word they can see in their

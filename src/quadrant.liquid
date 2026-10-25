@@ -1,17 +1,18 @@
-{% if app %}
+{% if app_count > 0 %}
 <div class="layout layout--col layout--center gap--small">
   <span class="value value--xlarge lg:value--mega value--tnums">{% render "capped_count", count: open_exception_count %}</span>
   <span class="label lg:label--xlarge">Open errors</span>
   <span class="description lg:description--xlarge">
     {% render "capped_count", count: open_performance_count %} slow, {{ monitors_down }}/{{ monitor_count }} monitors down
   </span>
-  {% assign latest = app.exceptionIncidents | first %}
+  {% assign latest_entry = exceptions | first %}
+  {% assign latest = latest_entry.incident %}
   {% if latest %}
   <span class="hidden lg:visible description lg:description--xlarge text--center" data-clamp="1">Latest: {{ latest.exceptionName | default: "Unknown error" | escape | replace: "::", "::&#8203;" }}</span>
   {% endif %}
 </div>
 {% else %}
-  {% render "problem", errors: errors %}
+  {% render "problem", errors: errors, message: problem_message %}
 {% endif %}
 
-{% render "title_bar", app: app %}
+{% render "title_bar", title: screen_title %}

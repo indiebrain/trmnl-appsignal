@@ -1,4 +1,4 @@
-{% if app %}
+{% if app_count > 0 %}
 <div class="layout layout--col gap--base">
   <div class="grid grid--cols-3 w--full">
     <div class="item">
@@ -24,16 +24,16 @@
   <div class="columns w--full">
     <div class="column" data-overflow="true" data-overflow-counter="true">
       <span class="label label--underline lg:label--xlarge">Latest errors</span>
-      {% for incident in app.exceptionIncidents %}
-        {% render "exception_item", incident: incident, now: now_seconds, detailed: true %}
+      {% for entry in exceptions limit: 8 %}
+        {% render "exception_item", incident: entry.incident, label: entry.label, now: now_seconds, detailed: true %}
       {% else %}
         <span class="description lg:description--xlarge">No open errors.</span>
       {% endfor %}
     </div>
     <div class="column portrait:hidden" data-overflow="true" data-overflow-counter="true">
       <span class="label label--underline lg:label--xlarge">Latest performance issues</span>
-      {% for incident in app.performanceIncidents %}
-        {% render "performance_item", incident: incident, now: now_seconds %}
+      {% for entry in performances limit: 8 %}
+        {% render "performance_item", incident: entry.incident, label: entry.label, now: now_seconds %}
       {% else %}
         <span class="description lg:description--xlarge">No open performance issues.</span>
       {% endfor %}
@@ -44,26 +44,18 @@
     {% endcomment %}
     <div class="column hidden lg:flex lg:portrait:hidden" data-overflow="true" data-overflow-counter="true">
       <span class="label label--underline lg:label--xlarge">Monitors</span>
-      {% for monitor in app.uptimeMonitors %}
-        {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
-        {% if open_alerts.size > 0 %}{% render "uptime_item", monitor: monitor, down: true %}{% endif %}
+      {% for entry in monitors_down_list %}
+        {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, down: true, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
       {% endfor %}
-      {% for check_in in app.checkIns.triggers %}
-        {% if check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% render "check_in_item", check_in: check_in, now: now_seconds %}{% endif %}
-      {% endfor %}
-      {% for monitor in app.uptimeMonitors %}
-        {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
-        {% if open_alerts.size == 0 %}{% render "uptime_item", monitor: monitor, down: false %}{% endif %}
-      {% endfor %}
-      {% for check_in in app.checkIns.triggers %}
-        {% unless check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% render "check_in_item", check_in: check_in, now: now_seconds %}{% endunless %}
+      {% for entry in monitors_up_list %}
+        {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, down: false, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
       {% endfor %}
       {% if monitor_count == 0 %}<span class="description lg:description--xlarge">No monitors.</span>{% endif %}
     </div>
   </div>
 </div>
 {% else %}
-  {% render "problem", errors: errors %}
+  {% render "problem", errors: errors, message: problem_message %}
 {% endif %}
 
-{% render "title_bar", app: app %}
+{% render "title_bar", title: screen_title %}

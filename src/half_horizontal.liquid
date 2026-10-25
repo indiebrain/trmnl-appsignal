@@ -1,4 +1,4 @@
-{% if app %}
+{% if app_count > 0 %}
 <div class="layout portrait:layout--col gap--base">
   <div class="flex flex--col portrait:flex--row gap--small">
     <div class="item">
@@ -16,8 +16,8 @@
   </div>
   <div class="columns stretch-x" data-overflow-max-cols="1" data-overflow-max-cols-lg="2">
     <div class="column" data-overflow="true" data-overflow-counter="true">
-      {% for incident in app.exceptionIncidents %}
-        {% render "exception_item", incident: incident, now: now_seconds, detailed: false %}
+      {% for entry in exceptions limit: 8 %}
+        {% render "exception_item", incident: entry.incident, label: entry.label, now: now_seconds, detailed: false %}
       {% else %}
         <span class="description lg:description--xlarge">No open errors.</span>
       {% endfor %}
@@ -25,7 +25,7 @@
   </div>
 </div>
 {% else %}
-  {% render "problem", errors: errors %}
+  {% render "problem", errors: errors, message: problem_message %}
 {% endif %}
 
-{% render "title_bar", app: app %}
+{% render "title_bar", title: screen_title %}

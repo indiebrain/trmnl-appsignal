@@ -1,7 +1,7 @@
 # AppSignal for TRMNL
 
-A TRMNL plugin that shows an AppSignal app's open incidents and uptime
-monitors. Built for the TRMNL X (1872 by 1404, 16 grays) and still readable on
+A TRMNL plugin that shows the open incidents and monitors of every app in an
+AppSignal organization, or of one app. Built for the TRMNL X (1872 by 1404, 16 grays) and still readable on
 the original TRMNL.
 
 ![The full view on a TRMNL X, with example data](tests/snapshots/linux/appsignal-looks-as-it-did-full-on-v2-v2-full.png)
@@ -12,10 +12,13 @@ the original TRMNL.
 | Half (either way) | Open error count, monitors down, latest errors |
 | Quadrant | Open error count with a one-line summary, plus the latest error on the TRMNL X |
 
+With more than one app, counts add up across apps, lists merge them newest
+first, and each row names its app.
+
 TRMNL polls AppSignal's GraphQL API directly every 15 minutes, so no server of
 your own is needed. It signs in with OAuth and asks only for the `app:read`
 scope: TRMNL never holds a personal API token, and the token it does hold can
-only read, belongs to one organization, and can be revoked on its own.
+only read, reaches only one organization, and can be revoked on its own.
 
 ## Install
 
@@ -27,10 +30,13 @@ only read, belongs to one organization, and can be revoked on its own.
    leave **OAuth Client Secret** empty, and save. TRMNL does not copy the
    client ID when it installs a recipe. To use your own client instead, see
    [Using your own OAuth client](#using-your-own-oauth-client).
-3. Click **Connect with OAuth**, approve read access in AppSignal, and pick
-   the app you want on the screen.
+3. Click **Connect with OAuth** and approve read access in AppSignal. AppSignal
+   asks you to pick an app, but the plugin can read every app in the
+   organization either way.
 4. Fill in the organization name, which is the part after `appsignal.com/` in
    the address bar when you open AppSignal (`appsignal.com/<organization>/...`).
+   Leave **App** blank to see every app, or enter one app's name (add the
+   environment, as in `my-app staging`, to pick one environment).
 5. Save, and add the plugin to a playlist.
 
 Enter `demo` as the organization to see example data without connecting.
@@ -62,7 +68,8 @@ Installing the recipe (rather than forking it) means taking every update its
 publisher pushes, and each update runs with the installer's AppSignal token. A
 publisher, or anyone who takes over the publisher's TRMNL account, could change
 where the plugin sends requests and collect those tokens. Each token can only
-read, and only what its installer approved. To limit this:
+read, but it reaches every app in the installer's AppSignal organization. To
+limit this:
 
 - The publisher keeps two-step sign-in on for TRMNL and GitHub.
 - Installers who would rather not take updates choose **Fork**, which copies the
@@ -71,15 +78,15 @@ read, and only what its installer approved. To limit this:
 
 ## Limits
 
-- Counts stop at 100 per incident type and show as "99+" beyond that.
+- AppSignal returns at most 100 open incidents of each type per app, and counts
+  of 100 or more show as "99+".
+- The request fetches the 8 newest incidents of each type from each app; the
+  lists merge them and show the newest 8.
 - Monitors are the app's uptime monitors and check-in monitors (cron and
   heartbeat). An uptime monitor counts as down when it has an alert in the
   `OPEN` state; a check-in monitor counts as down when its latest run was
   missed or late.
-- AppSignal asks which app to allow when you connect. A token limited to that
-  app should leave only that app in the organization list. This is untested with
-  an organization that has several apps; until then the screen shows the first
-  app the token can read.
+- An App name that matches nothing shows the apps the organization has.
 - A blank or wrong organization name shows AppSignal's "Object not found." An
   expired or revoked connection shows "Request could not be authenticated."
 

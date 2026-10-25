@@ -1,9 +1,12 @@
 {% comment %}
   Shared by every layout. The polled GraphQL response arrives as `data`
-  (or `errors` when AppSignal rejects the request).
+  (or `errors` when AppSignal rejects the request). This part picks the apps to
+  show and merges their incidents and monitors, so the layouts draw one app or
+  every app the same way.
 {% endcomment %}
 {% assign now_seconds = "now" | date: "%s" | plus: 0 %}
 {% assign organization = trmnl.plugin_settings.custom_fields_values.organization | default: "" | strip | downcase %}
+{% assign wanted_app = trmnl.plugin_settings.custom_fields_values.app | default: "" | strip | downcase %}
 
 {% if organization == "demo" %}
   {% comment %}
@@ -32,37 +35,99 @@
     "uptimeMonitors": [
       {"name": "Homepage", "alerts": [{"state": "CLOSED"}]},
       {"name": "API", "alerts": [{"state": "OPEN"}, {"state": "CLOSED"}]},
-  {"name": "Status", "alerts": []}
-],
-"checkIns": {"triggers": [
-  {"identifier": "nightly-backup", "kind": "CRON", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 19800 }}"},
-  {"identifier": "invoice-sync", "kind": "CRON", "lastState": "MISSED", "lastUpdateAt": "{{ now_seconds | minus: 5400 }}"},
-  {"identifier": "queue-worker", "kind": "HEARTBEAT", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 120 }}"}
-]}
+      {"name": "Status", "alerts": []}
+    ],
+    "checkIns": {"triggers": [
+      {"identifier": "nightly-backup", "kind": "CRON", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 19800 }}"},
+      {"identifier": "queue-worker", "kind": "HEARTBEAT", "lastState": "FINISHED", "lastUpdateAt": "{{ now_seconds | minus: 120 }}"}
+    ]}
+  }, {
+    "name": "billing-api", "environment": "production",
+    "openExceptions": [{"number": 58}, {"number": 57}],
+    "openPerformance": [],
+    "exceptionIncidents": [
+      {"number": 58, "count": 41, "lastOccurredAt": "{{ now_seconds | minus: 720 }}", "exceptionName": "Stripe::RateLimitError", "exceptionMessage": "Request rate limit exceeded", "namespace": "web", "actionNames": ["WebhooksController#create"]},
+      {"number": 57, "count": 6, "lastOccurredAt": "{{ now_seconds | minus: 180000 }}", "exceptionName": "Faraday::ConnectionFailed", "exceptionMessage": "Failed to open TCP connection to api.example.com:443", "namespace": "background", "actionNames": ["InvoiceExportJob#perform"]}
+    ],
+    "performanceIncidents": [],
+    "uptimeMonitors": [],
+    "checkIns": {"triggers": [
+      {"identifier": "invoice-sync", "kind": "CRON", "lastState": "MISSED", "lastUpdateAt": "{{ now_seconds | minus: 5400 }}"}
+    ]}
   }]}
   {% endcapture %}
   {% assign demo = demo_json | parse_json %}
-  {% assign app = demo.apps | first %}
+  {% assign org_apps = demo.apps %}
 {% else %}
-  {% comment %} Shows the first app. Connecting asks the user to pick an app, which should leave only that one in the list. {% endcomment %}
-  {% assign app = data.organization.apps | first %}
+  {% assign org_apps = data.organization.apps %}
 {% endif %}
 
-{% assign open_exception_count = app.openExceptions | size %}
-{% assign open_performance_count = app.openPerformance | size %}
+{% comment %}
+  A blank App setting shows every app. Otherwise it matches an app's name, or
+  its name and environment ("duty-roster staging"), ignoring case.
+{% endcomment %}
+{% if wanted_app == "" %}
+  {% assign apps = org_apps %}
+{% else %}
+  {% assign sep = "" %}
+  {% capture apps_json %}[{% for a in org_apps %}{% assign name = a.name | downcase %}{% assign name_env = a.name | append: " " | append: a.environment | downcase %}{% if name == wanted_app or name_env == wanted_app %}{{ sep }}{{ a | json }}{% assign sep = "," %}{% endif %}{% endfor %}]{% endcapture %}
+  {% assign apps = apps_json | parse_json %}
+{% endif %}
+{% assign app_count = apps | size %}
 
-{% assign monitors_down = 0 %}
-{% for monitor in app.uptimeMonitors %}
-  {% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}
-  {% if open_alerts.size > 0 %}{% assign monitors_down = monitors_down | plus: 1 %}{% endif %}
+{% if app_count == 0 and org_apps.size > 0 %}
+  {% capture problem_message %}No app named "{{ wanted_app }}". Apps in this organization: {% for a in org_apps %}{{ a.name }} {{ a.environment }}{% unless forloop.last %}, {% endunless %}{% endfor %}.{% endcapture %}
+{% endif %}
+
+{% comment %}
+  With more than one app, each row names its app, adding the environment when
+  two apps share a name.
+{% endcomment %}
+{% assign app_names = apps | map: "name" %}
+{% assign unique_app_names = app_names | uniq %}
+{% if unique_app_names.size < app_names.size %}{% assign label_environment = true %}{% else %}{% assign label_environment = false %}{% endif %}
+
+{% if app_count == 0 %}
+  {% assign screen_title = "" %}
+{% elsif app_count == 1 %}
+  {% assign only_app = apps | first %}
+  {% capture screen_title %}{{ only_app.name }} {{ only_app.environment }}{% endcapture %}
+{% elsif wanted_app == "" %}
+  {% capture screen_title %}All apps ({{ app_count }}){% endcapture %}
+{% else %}
+  {% assign first_app = apps | first %}{% capture screen_title %}{{ first_app.name }} ({{ app_count }} environments){% endcapture %}
+{% endif %}
+
+{% comment %}
+  Liquid cannot merge lists by date, so each incident is written out as JSON
+  with its app label and time in seconds, then parsed back and sorted.
+{% endcomment %}
+{% assign open_exception_count = 0 %}
+{% assign open_performance_count = 0 %}
+{% assign exception_sep = "" %}
+{% assign performance_sep = "" %}
+{% assign monitor_sep = "" %}
+{% capture exceptions_json %}[{% for a in apps %}{% if app_count > 1 %}{% if label_environment %}{% assign label = a.name | append: " " | append: a.environment %}{% else %}{% assign label = a.name %}{% endif %}{% else %}{% assign label = "" %}{% endif %}{% for incident in a.exceptionIncidents %}{{ exception_sep }}{"label": {{ label | json }}, "at": {{ incident.lastOccurredAt | date: "%s" | plus: 0 }}, "incident": {{ incident | json }}}{% assign exception_sep = "," %}{% endfor %}{% endfor %}]{% endcapture %}
+{% capture performances_json %}[{% for a in apps %}{% if app_count > 1 %}{% if label_environment %}{% assign label = a.name | append: " " | append: a.environment %}{% else %}{% assign label = a.name %}{% endif %}{% else %}{% assign label = "" %}{% endif %}{% for incident in a.performanceIncidents %}{{ performance_sep }}{"label": {{ label | json }}, "at": {{ incident.lastOccurredAt | date: "%s" | plus: 0 }}, "incident": {{ incident | json }}}{% assign performance_sep = "," %}{% endfor %}{% endfor %}]{% endcapture %}
+{% comment %}
+  A monitor is down when an uptime monitor has an OPEN alert, or a check-in
+  monitor's latest run was missed or late.
+{% endcomment %}
+{% capture monitors_json %}[{% for a in apps %}{% if app_count > 1 %}{% if label_environment %}{% assign label = a.name | append: " " | append: a.environment %}{% else %}{% assign label = a.name %}{% endif %}{% else %}{% assign label = "" %}{% endif %}{% for monitor in a.uptimeMonitors %}{% assign open_alerts = monitor.alerts | where: "state", "OPEN" %}{{ monitor_sep }}{"label": {{ label | json }}, "kind": "uptime", "state": "{% if open_alerts.size > 0 %}down{% else %}up{% endif %}", "monitor": {{ monitor | json }}}{% assign monitor_sep = "," %}{% endfor %}{% for check_in in a.checkIns.triggers %}{{ monitor_sep }}{"label": {{ label | json }}, "kind": "check_in", "state": "{% if check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}down{% else %}up{% endif %}", "monitor": {{ check_in | json }}}{% assign monitor_sep = "," %}{% endfor %}{% endfor %}]{% endcapture %}
+{% for a in apps %}
+  {% assign app_exception_count = a.openExceptions | size %}
+  {% assign app_performance_count = a.openPerformance | size %}
+  {% assign open_exception_count = open_exception_count | plus: app_exception_count %}
+  {% assign open_performance_count = open_performance_count | plus: app_performance_count %}
 {% endfor %}
-{% comment %} A check-in monitor is down when its latest run was missed or late. {% endcomment %}
-{% for check_in in app.checkIns.triggers %}
-  {% if check_in.lastState == "MISSED" or check_in.lastState == "LATE" %}{% assign monitors_down = monitors_down | plus: 1 %}{% endif %}
-{% endfor %}
-{% assign uptime_count = app.uptimeMonitors | size %}
-{% assign check_in_count = app.checkIns.triggers | size %}
-{% assign monitor_count = uptime_count | plus: check_in_count %}
+
+{% assign exceptions = exceptions_json | parse_json | sort: "at" | reverse %}
+{% assign performances = performances_json | parse_json | sort: "at" | reverse %}
+{% assign monitors = monitors_json | parse_json %}
+{% assign monitors_down_list = monitors | where: "state", "down" %}
+{% assign monitors_up_list = monitors | where: "state", "up" %}
+{% assign monitors_down = monitors_down_list | size %}
+{% assign monitor_count = monitors | size %}
 
 {% template capped_count %}{% if count >= 100 %}99+{% else %}{{ count }}{% endif %}{% endtemplate %}
 
@@ -80,6 +145,7 @@
     <span class="title title--small lg:title--large" data-clamp="1">{{ incident.exceptionName | default: "Unknown error" | escape | replace: "::", "::&#8203;" }}</span>
     {% if detailed %}<span class="description lg:description--xlarge" data-clamp="1">{{ incident.exceptionMessage | escape }}</span>{% endif %}
     <div class="flex flex--wrap gap--small">
+      {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
       <span class="label label--small lg:label--large">#{{ incident.number }}</span>
       <span class="label label--small lg:label--large label--underline">{{ incident.count | number_with_delimiter }}x</span>
       <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
@@ -95,6 +161,7 @@
   <div class="content">
     <span class="title title--small lg:title--large" data-clamp="1">{{ incident.actionNames | first | default: incident.namespace | escape | replace: "#", "#&#8203;" | replace: "::", "::&#8203;" }}</span>
     <div class="flex flex--wrap gap--small">
+      {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
       <span class="label label--small lg:label--large">#{{ incident.number }}</span>
       <span class="label label--small lg:label--large label--underline">{{ incident.mean | round }}ms mean</span>
       <span class="label label--small lg:label--large">{% assign at = incident.lastOccurredAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>
@@ -110,6 +177,7 @@
   <div class="content">
     <span class="title title--small lg:title--large" data-clamp="1">{{ monitor.name | escape }}</span>
     <div class="flex flex--wrap gap--small">
+      {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
       {% if down %}<span class="label label--small lg:label--large label--inverted">Down</span>{% else %}<span class="label label--small lg:label--large">Up</span>{% endif %}
       <span class="label label--small lg:label--large label--gray 1bit:text--black">Uptime</span>
     </div>
@@ -123,6 +191,7 @@
   <div class="content">
     <span class="title title--small lg:title--large" data-clamp="1">{{ check_in.identifier | escape }}</span>
     <div class="flex flex--wrap gap--small">
+      {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
       {% case check_in.lastState %}
         {% when "FINISHED" %}<span class="label label--small lg:label--large">OK</span>
         {% when "STARTED" %}<span class="label label--small lg:label--large">Running</span>
@@ -142,7 +211,7 @@
 <div class="layout layout--col layout--center gap--small">
   <span class="title">AppSignal did not answer</span>
   <span class="description text--center">
-    {% if errors %}{{ errors | map: "message" | join: "; " | escape }} Check the organization name in the plugin settings, or connect again.{% else %}No apps found. Check the organization name in the plugin settings.{% endif %}
+    {% if message %}{{ message | escape }}{% elsif errors %}{{ errors | map: "message" | join: "; " | escape }} Check the organization name in the plugin settings, or connect again.{% else %}No apps found. Check the organization name in the plugin settings.{% endif %}
   </span>
 </div>
 {% endtemplate %}
@@ -150,6 +219,6 @@
 {% template title_bar %}
 <div class="title_bar">
   <span class="title">AppSignal</span>
-  <span class="instance">{{ app.name | escape }} {{ app.environment | escape }}</span>
+  <span class="instance">{{ title | escape }}</span>
 </div>
 {% endtemplate %}

@@ -1,4 +1,4 @@
-{% if app %}
+{% if app_count > 0 %}
 <div class="layout layout--col gap--base">
   <div class="grid grid--cols-2 w--full">
     <div class="item">
@@ -14,16 +14,18 @@
       </div>
     </div>
   </div>
-  <div class="column w--full" data-overflow="true" data-overflow-counter="true">
-    {% for incident in app.exceptionIncidents %}
-      {% render "exception_item", incident: incident, now: now_seconds, detailed: false %}
-    {% else %}
-      <span class="description lg:description--xlarge">No open errors.</span>
-    {% endfor %}
+  <div class="columns w--full" data-overflow-max-cols="1">
+    <div class="column" data-overflow="true" data-overflow-counter="true">
+      {% for entry in exceptions limit: 8 %}
+        {% render "exception_item", incident: entry.incident, label: entry.label, now: now_seconds, detailed: false %}
+      {% else %}
+        <span class="description lg:description--xlarge">No open errors.</span>
+      {% endfor %}
+    </div>
   </div>
 </div>
 {% else %}
-  {% render "problem", errors: errors %}
+  {% render "problem", errors: errors, message: problem_message %}
 {% endif %}
 
-{% render "title_bar", app: app %}
+{% render "title_bar", title: screen_title %}

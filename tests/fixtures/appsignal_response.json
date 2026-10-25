@@ -28,8 +28,23 @@
       "checkIns": {
         "triggers": [
           {"identifier": "nightly-backup", "kind": "CRON", "lastState": "FINISHED", "lastUpdateAt": "2026-10-23T09:30:00Z"},
-          {"identifier": "invoice-sync", "kind": "CRON", "lastState": "MISSED", "lastUpdateAt": "2026-10-23T13:30:00Z"},
           {"identifier": "queue-worker", "kind": "HEARTBEAT", "lastState": "FINISHED", "lastUpdateAt": "2026-10-23T14:58:00Z"}
+        ]
+      }
+    }, {
+      "name": "billing-api",
+      "environment": "production",
+      "openExceptions": [{"number": 58}, {"number": 57}],
+      "openPerformance": [],
+      "exceptionIncidents": [
+        {"number": 58, "count": 41, "lastOccurredAt": "2026-10-23T14:48:00Z", "exceptionName": "Stripe::RateLimitError", "exceptionMessage": "Request rate limit exceeded", "namespace": "web", "actionNames": ["WebhooksController#create"], "severity": "HIGH"},
+        {"number": 57, "count": 6, "lastOccurredAt": "2026-10-21T13:00:00Z", "exceptionName": "Faraday::ConnectionFailed", "exceptionMessage": "Failed to open TCP connection to api.example.com:443", "namespace": "background", "actionNames": ["InvoiceExportJob#perform"], "severity": "LOW"}
+      ],
+      "performanceIncidents": [],
+      "uptimeMonitors": [],
+      "checkIns": {
+        "triggers": [
+          {"identifier": "invoice-sync", "kind": "CRON", "lastState": "MISSED", "lastUpdateAt": "2026-10-23T13:30:00Z"}
         ]
       }
     }]

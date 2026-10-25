@@ -59,6 +59,38 @@ RSpec.describe 'AppSignal' do
     expect(html).to include('1h ago')
   end
 
+  it 'merges every app, newest first, naming each row\'s app, when App is blank' do
+    html = trmnl.render(view: 'full', mocks:, custom_fields:, now:).result.html
+    errors = html.scan(/>(ActiveRecord::&#8203;RecordNotFound|Stripe::&#8203;RateLimitError|Net::&#8203;ReadTimeout)</).flatten
+
+    expect(errors).to eq(%w[ActiveRecord::&#8203;RecordNotFound Stripe::&#8203;RateLimitError Net::&#8203;ReadTimeout])
+    expect(html).to include('All apps (2)')
+    expect(html).to match(/label--outline[^>]*>billing-api</)
+  end
+
+  it 'shows only the named app, ignoring case' do
+    html = trmnl.render(view: 'full', mocks:, custom_fields: custom_fields.merge('app' => ' Billing-API '), now:).result.html
+
+    expect(html).to include('billing-api production')
+    expect(html).to include('Stripe::&#8203;RateLimitError')
+    expect(html).not_to include('RecordNotFound')
+    expect(html).not_to include('label--outline')
+  end
+
+  it 'picks one environment when App names it' do
+    html = trmnl.render(mocks:, custom_fields: custom_fields.merge('app' => 'billing-api production'), now:).result.html
+
+    expect(html).to include('Stripe::&#8203;RateLimitError')
+    expect(html).not_to include('RecordNotFound')
+  end
+
+  it 'lists the apps it found when App matches none' do
+    html = trmnl.render(mocks:, custom_fields: custom_fields.merge('app' => 'nope'), now:).result.html
+
+    expect(html).to include('No app named &quot;nope&quot;')
+    expect(html).to include('example-app production, billing-api production')
+  end
+
   it 'lets long action names break after :: and # without mangling them' do
     screen = trmnl.render(mocks:, custom_fields:, now:)
 
