@@ -60,6 +60,11 @@ mise exec -- trmnlp serve   # preview at http://localhost:4567; click "Connect a
 mise exec -- trmnlp lint
 ```
 
+The preview reads `APPSIGNAL_ORGANIZATION` when it starts, so restart it after
+changing `mise.local.toml`. Typing in the preview's **Custom Fields** box
+rewrites `.trmnlp.yml` with the value you typed; restore it with
+`git checkout -- .trmnlp.yml` before committing.
+
 The preview tool and TRMNL disagree on how to switch on PKCE (the extra check
 AppSignal needs for clients without a secret): TRMNL keeps only
 `oauth_pkce_enabled: 'yes'`, and `trmnlp serve` accepts only `'true'`, hiding
