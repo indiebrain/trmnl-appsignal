@@ -5,6 +5,10 @@
   <span class="description lg:description--xlarge">
     {% render "capped_count", count: open_performance_count %} slow, {{ monitors_down }}/{{ monitor_count }} monitors down
   </span>
+  {% assign latest = app.exceptionIncidents | first %}
+  {% if latest %}
+  <span class="hidden lg:visible description lg:description--xlarge text--center" data-clamp="1">Latest: {{ latest.exceptionName | default: "Unknown error" | escape | replace: "::", "::&#8203;" }}</span>
+  {% endif %}
 </div>
 {% else %}
   {% render "problem", errors: errors %}
