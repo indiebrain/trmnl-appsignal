@@ -50,13 +50,22 @@ RSpec.describe 'AppSignal' do
     expect(screen.result.html).to match(%r{2<span[^>]*>/6</span>})
   end
 
-  it 'lists monitors in the full view, those that are down first' do
+  it 'lists only the monitors that are down in the full view' do
     html = trmnl.render(view: 'full', mocks:, custom_fields:, now:).result.html
     names = html.scan(/>(Homepage|API|Status|nightly-backup|invoice-sync|queue-worker)</).flatten
 
-    expect(names).to eq(%w[API invoice-sync Homepage Status nightly-backup queue-worker])
+    expect(names).to eq(%w[API invoice-sync])
     expect(html).to include('Missed')
     expect(html).to include('1h ago')
+  end
+
+  it 'says every monitor is up when none is down' do
+    apps = response.dig('data', 'organization', 'apps')
+    apps.each { |app| app['uptimeMonitors'].each { |monitor| monitor['alerts'] = [] } }
+    apps.each { |app| app['checkIns']['triggers'].each { |check_in| check_in['lastState'] = 'FINISHED' } }
+    html = trmnl.render(view: 'full', mocks:, custom_fields:, now:).result.html
+
+    expect(html).to include('All 6 monitors up.')
   end
 
   it 'merges every app, newest first, naming each row\'s app, when App is blank' do

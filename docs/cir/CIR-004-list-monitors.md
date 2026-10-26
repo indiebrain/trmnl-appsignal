@@ -1,5 +1,8 @@
 # CIR-004: List uptime and check-in monitors with their status
 
+Status: Partly superseded by CIR-006. The column lists only monitors that are
+down.
+
 ## Intent
 Show which monitors are failing, not only how many, so a glance at the screen
 says what to look at. Check-in monitors (cron jobs and heartbeats) count

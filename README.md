@@ -8,7 +8,7 @@ the original TRMNL.
 
 | View | Shows |
 |------|-------|
-| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues, and every monitor with its status (TRMNL X in landscape; errors only in portrait) |
+| Full | Open error count, slow action count, monitors down, latest errors, latest performance issues, and the monitors that are down (TRMNL X in landscape; errors only in portrait) |
 | Half (either way) | Open error count, monitors down, latest errors |
 | Quadrant | Open error count with a one-line summary, plus the latest error on the TRMNL X |
 

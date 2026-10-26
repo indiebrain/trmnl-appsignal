@@ -39,18 +39,19 @@
       {% endfor %}
     </div>
     {% comment %}
-      Monitors that are down come first, so the overflow counter hides only healthy ones.
+      Only monitors that are down are listed; the count above covers the rest.
       Only the TRMNL X in landscape is wide enough for a third column.
     {% endcomment %}
     <div class="column hidden lg:flex lg:portrait:hidden" data-overflow="true" data-overflow-counter="true">
       <span class="label label--underline lg:label--xlarge">Monitors</span>
       {% for entry in monitors_down_list %}
-        {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, down: true, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
+        {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
       {% endfor %}
-      {% for entry in monitors_up_list %}
-        {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, down: false, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
-      {% endfor %}
-      {% if monitor_count == 0 %}<span class="description lg:description--xlarge">No monitors.</span>{% endif %}
+      {% if monitor_count == 0 %}
+        <span class="description lg:description--xlarge">No monitors.</span>
+      {% elsif monitors_down == 0 %}
+        <span class="description lg:description--xlarge">All {{ monitor_count }} monitors up.</span>
+      {% endif %}
     </div>
   </div>
 </div>

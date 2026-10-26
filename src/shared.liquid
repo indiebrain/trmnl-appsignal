@@ -125,7 +125,6 @@
 {% assign performances = performances_json | parse_json | sort: "at" | reverse %}
 {% assign monitors = monitors_json | parse_json %}
 {% assign monitors_down_list = monitors | where: "state", "down" %}
-{% assign monitors_up_list = monitors | where: "state", "up" %}
 {% assign monitors_down = monitors_down_list | size %}
 {% assign monitor_count = monitors | size %}
 
@@ -178,7 +177,7 @@
     <span class="title title--small lg:title--large" data-clamp="1">{{ monitor.name | escape }}</span>
     <div class="flex flex--wrap gap--small">
       {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
-      {% if down %}<span class="label label--small lg:label--large label--inverted">Down</span>{% else %}<span class="label label--small lg:label--large">Up</span>{% endif %}
+      <span class="label label--small lg:label--large label--inverted">Down</span>
       <span class="label label--small lg:label--large label--gray 1bit:text--black">Uptime</span>
     </div>
   </div>
@@ -192,14 +191,7 @@
     <span class="title title--small lg:title--large" data-clamp="1">{{ check_in.identifier | escape }}</span>
     <div class="flex flex--wrap gap--small">
       {% if label != blank %}<span class="label label--small lg:label--large label--outline" data-clamp="1">{{ label | escape }}</span>{% endif %}
-      {% case check_in.lastState %}
-        {% when "FINISHED" %}<span class="label label--small lg:label--large">OK</span>
-        {% when "STARTED" %}<span class="label label--small lg:label--large">Running</span>
-        {% when "NEW" %}<span class="label label--small lg:label--large">Waiting</span>
-        {% when "MISSED" %}<span class="label label--small lg:label--large label--inverted">Missed</span>
-        {% when "LATE" %}<span class="label label--small lg:label--large label--inverted">Late</span>
-        {% else %}<span class="label label--small lg:label--large">Unexpected</span>
-      {% endcase %}
+      <span class="label label--small lg:label--large label--inverted">{% if check_in.lastState == "LATE" %}Late{% else %}Missed{% endif %}</span>
       <span class="label label--small lg:label--large label--gray 1bit:text--black">{% if check_in.kind == "HEARTBEAT" %}Heartbeat{% else %}Cron{% endif %}</span>
       {% if check_in.lastUpdateAt %}<span class="label label--small lg:label--large">{% assign at = check_in.lastUpdateAt | date: "%s" | plus: 0 %}{% render "time_ago", now: now, at: at %}</span>{% endif %}
     </div>
