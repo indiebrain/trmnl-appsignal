@@ -43,7 +43,7 @@
       Only the TRMNL X in landscape is wide enough for a third column.
     {% endcomment %}
     <div class="column hidden lg:flex lg:portrait:hidden" data-overflow="true" data-overflow-counter="true">
-      <span class="label label--underline lg:label--xlarge">Monitors</span>
+      <span class="label label--underline lg:label--xlarge">Failing monitors</span>
       {% for entry in monitors_down_list %}
         {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
       {% endfor %}
