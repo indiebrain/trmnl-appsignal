@@ -105,7 +105,9 @@ as a private plugin.
 
 2. Paste the TRMNL client ID from the table below into the plugin's OAuth
    settings on TRMNL, and leave the client secret empty. Uploads do not set it,
-   and later uploads leave it alone.
+   and later uploads leave it alone. If you publish your copy as a recipe, also
+   tick **Share OAuth credentials with recipe installers?** so installers
+   connect through your client without pasting anything.
 3. Connect and fill in the organization as the [README](README.md#install)
    describes.
 
@@ -155,11 +157,11 @@ recover:
 
 1. Register a new client with the command above, using the TRMNL callback.
 2. Replace the old ID everywhere it appears (`git grep <old client ID>`): the
-   `oauth_client_id` and setup steps in `src/settings.yml`, the README install
-   steps, and the table above.
+   `oauth_client_id` in `src/settings.yml` and the table above.
 3. Push with `bin/push`, then paste the new ID into your own plugin's OAuth
-   settings on TRMNL, since uploads do not set it.
-4. Tell installers to paste the new ID and connect again: open a pinned GitHub
+   settings on TRMNL, since uploads do not set it. Recipe installs share those
+   settings, so they pick up the new ID.
+4. Tell installers to connect again: open a pinned GitHub
    issue, and say so at the top of the About text in `src/settings.yml`.
 
 ## License

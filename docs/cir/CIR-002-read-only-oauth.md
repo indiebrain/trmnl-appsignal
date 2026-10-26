@@ -27,9 +27,11 @@ the AppSignal account.
 - AppSignal registers OAuth clients without approval but accepts one callback
   address per client, and returns an existing client when the callbacks match
   one it already has.
-- Neither uploads nor recipe installs set the OAuth client ID on TRMNL; each
-  copy of the plugin needs it pasted into its OAuth settings. TRMNL leaves client credentials, polling headers,
-  and the polling body out of exports.
+- Uploads do not set the OAuth client ID on TRMNL; it is pasted into the
+  plugin's OAuth settings once. Recipe installs use the publisher's client
+  when the publisher ticks "Share OAuth credentials with recipe installers?".
+  TRMNL leaves client credentials, polling headers, and the polling body out
+  of exports.
 - AppSignal rate-limits per user and IP address, not per OAuth client, and its
   client registration takes no contact address.
 

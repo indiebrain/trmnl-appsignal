@@ -25,30 +25,27 @@ only read, reaches only one organization, and can be revoked on its own.
 1. Open the [AppSignal recipe](https://trmnl.com/recipes/appsignal-518240) on
    TRMNL and click **Install**, or **Fork** to take a copy that does not receive
    updates (see below).
-2. On the plugin's settings page, paste
-   `SSxE-b54Nak88428BadY9JQeDS0sck3JGgycXSIL2ho` into **OAuth Client ID**,
-   leave **OAuth Client Secret** empty, and save. TRMNL does not copy the
-   client ID when it installs a recipe. To use your own client instead, see
-   [Using your own OAuth client](#using-your-own-oauth-client).
-3. Click **Connect with OAuth** and approve read access in AppSignal. AppSignal
-   asks you to pick an app, but the plugin can read every app in the
-   organization either way.
-4. Fill in the organization name, which is the part after `appsignal.com/` in
+2. On the plugin's settings page, click **Connect with OAuth** and approve read
+   access in AppSignal. The plugin connects through the recipe's OAuth client,
+   so there is nothing to paste. AppSignal asks you to pick an app, but the
+   plugin can read every app in the organization either way.
+3. Fill in the organization name, which is the part after `appsignal.com/` in
    the address bar when you open AppSignal (`appsignal.com/<organization>/...`).
    Leave **App** blank to see every app, or enter one app's name (add the
    environment, as in `my-app staging`, to pick one environment).
-5. Save, and add the plugin to a playlist.
+4. Save, and add the plugin to a playlist.
 
 Enter `demo` as the organization to see example data without connecting.
 
 ### Using your own OAuth client
 
-Every install that pastes the client ID above shares one AppSignal OAuth client.
+Every install of the recipe shares its AppSignal OAuth client.
 AppSignal rate-limits each user and IP address, not each client, so installs do
 not share a limit. When it sees abusive traffic, AppSignal contacts the user
 behind it before acting against the client. If AppSignal did revoke the shared
 client, every install using it would stop refreshing at once. To keep yours
-independent, register your own client and paste its ID in step 2 instead:
+independent, register your own client and paste its ID into **OAuth Client
+ID** before connecting:
 
 ```sh
 curl -X POST https://appsignal.com/oauth/register \
