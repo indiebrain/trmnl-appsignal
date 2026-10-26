@@ -44,9 +44,11 @@ Enter `demo` as the organization to see example data without connecting.
 ### Using your own OAuth client
 
 Every install that pastes the client ID above shares one AppSignal OAuth client.
-If AppSignal rate-limits or revokes that client, every one of those installs
-stops refreshing at once. To keep yours independent, register your own client
-and paste its ID in step 2 instead:
+AppSignal rate-limits each user and IP address, not each client, so installs do
+not share a limit. When it sees abusive traffic, AppSignal contacts the user
+behind it before acting against the client. If AppSignal did revoke the shared
+client, every install using it would stop refreshing at once. To keep yours
+independent, register your own client and paste its ID in step 2 instead:
 
 ```sh
 curl -X POST https://appsignal.com/oauth/register \

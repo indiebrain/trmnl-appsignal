@@ -131,7 +131,10 @@ address per client, so there are two:
 | `nUr-tu_3pJcoct2D0XoWZWsGPPNATOdTtjBjEXT6Jrk` | `http://localhost:4567/oauth/callback` | `trmnlp serve` (as `TRMNL_OAUTH_CLIENT_ID`) |
 
 Client IDs are public: they identify the plugin to AppSignal and grant nothing
-on their own. To register your own, post to AppSignal's registration endpoint:
+on their own. Registration takes no contact address, so each request sends a
+`User-Agent` naming this repository, which tells AppSignal where to reach the
+maintainer. To register your own client, post to AppSignal's registration
+endpoint:
 
 ```sh
 curl -X POST https://appsignal.com/oauth/register \

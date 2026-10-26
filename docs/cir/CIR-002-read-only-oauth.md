@@ -30,6 +30,8 @@ the AppSignal account.
 - Neither uploads nor recipe installs set the OAuth client ID on TRMNL; each
   copy of the plugin needs it pasted into its OAuth settings. TRMNL leaves client credentials, polling headers,
   and the polling body out of exports.
+- AppSignal rate-limits per user and IP address, not per OAuth client, and its
+  client registration takes no contact address.
 
 ## Decisions
 - OAuth with the `app:read` scope replaces the personal API token, which could
@@ -46,6 +48,8 @@ the AppSignal account.
 - Rejected: AppSignal's outgoing webhook notifier pointed at TRMNL. It needs no
   credential, but sends events, so the screen could not show what is currently
   open.
+- Every request sends a `User-Agent` naming the GitHub repository, so AppSignal
+  can find the maintainer of the shared client.
 - Two OAuth clients (TRMNL and local preview) because AppSignal keeps only one
   callback per client.
 - `bin/push` restores `src/settings.yml` after each push, because `trmnlp push`
