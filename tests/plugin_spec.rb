@@ -59,6 +59,22 @@ RSpec.describe 'AppSignal' do
     expect(html).to include('1h ago')
   end
 
+  # The fixture has 2 of 6 monitors down; extra monitors make the count 2/10 and 12/16.
+  { '2/10' => [4, 'CLOSED'], '12/16' => [10, 'OPEN'] }.each do |count, (extra, state)|
+    it "fits a monitor count of #{count} in its column" do
+      app = response.dig('data', 'organization', 'apps', 0)
+      app['uptimeMonitors'] += Array.new(extra) { |i| { 'name' => "Extra #{i}", 'alerts' => [{ 'state' => state }] } }
+
+      [%w[og_plus landscape], %w[v2 landscape], %w[v2 portrait]].each do |device, orientation|
+        %w[full half_horizontal half_vertical].each do |view|
+          screen = trmnl.render(view:, device:, orientation: orientation.to_sym, mocks:, custom_fields:, now:)
+
+          expect(screen.overflowing).to be_empty, "#{view} on #{device} #{orientation}: #{screen.overflowing.inspect}"
+        end
+      end
+    end
+  end
+
   it 'says every monitor is up when none is down' do
     apps = response.dig('data', 'organization', 'apps')
     apps.each { |app| app['uptimeMonitors'].each { |monitor| monitor['alerts'] = [] } }

@@ -1,21 +1,32 @@
 {% if app_count > 0 %}
+{% comment %}
+  On the TRMNL X, each count fits three characters at the largest sizes
+  below. A longer monitor count (4/10, 12/16) steps every count down a size.
+{% endcomment %}
+{% if monitor_text_length > 4 %}
+  {% assign count_size = "lg:landscape:value--xxlarge lg:portrait:value--xlarge" %}
+{% elsif monitor_text_length > 3 %}
+  {% assign count_size = "lg:landscape:value--xxxlarge lg:portrait:value--xxlarge" %}
+{% else %}
+  {% assign count_size = "lg:landscape:value--mega lg:portrait:value--xxxlarge" %}
+{% endif %}
 <div class="layout layout--col gap--base">
   <div class="grid grid--cols-3 w--full">
     <div class="item">
       <div class="content">
-        <span class="value value--xlarge lg:value--mega lg:portrait:value--xxxlarge value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+        <span class="value value--xlarge {{ count_size }} value--tnums">{% render "capped_count", count: open_exception_count %}</span>
         <span class="label lg:label--xlarge">Open errors</span>
       </div>
     </div>
     <div class="item">
       <div class="content">
-        <span class="value value--xlarge lg:value--mega lg:portrait:value--xxxlarge value--tnums">{% render "capped_count", count: open_performance_count %}</span>
+        <span class="value value--xlarge {{ count_size }} value--tnums">{% render "capped_count", count: open_performance_count %}</span>
         <span class="label lg:label--xlarge">Slow actions</span>
       </div>
     </div>
     <div class="item">
       <div class="content">
-        <span class="value value--xlarge lg:value--mega lg:portrait:value--xxxlarge value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+        <span class="value value--xlarge {{ count_size }} value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
         <span class="label lg:label--xlarge">Monitors down</span>
       </div>
     </div>

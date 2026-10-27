@@ -127,6 +127,9 @@
 {% assign monitors_down_list = monitors | where: "state", "down" %}
 {% assign monitors_down = monitors_down_list | size %}
 {% assign monitor_count = monitors | size %}
+{% comment %}The views shrink their counts when this one runs past three characters.{% endcomment %}
+{% capture monitor_text %}{{ monitors_down }}/{{ monitor_count }}{% endcapture %}
+{% assign monitor_text_length = monitor_text | size %}
 
 {% template capped_count %}{% if count >= 100 %}99+{% else %}{{ count }}{% endif %}{% endtemplate %}
 
