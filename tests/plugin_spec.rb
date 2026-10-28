@@ -76,12 +76,33 @@ RSpec.describe 'AppSignal' do
   end
 
   it 'says every monitor is up when none is down' do
-    apps = response.dig('data', 'organization', 'apps')
-    apps.each { |app| app['uptimeMonitors'].each { |monitor| monitor['alerts'] = [] } }
-    apps.each { |app| app['checkIns']['triggers'].each { |check_in| check_in['lastState'] = 'FINISHED' } }
+    empty_in_every_app('monitors')
     html = trmnl.render(view: 'full', mocks:, custom_fields:, now:).result.html
 
     expect(html).to include('All 6 monitors up.')
+  end
+
+  {
+    'only monitors are failing' => %w[exceptions performance],
+    'only errors are open' => %w[performance monitors],
+    'nothing is open' => %w[exceptions performance monitors]
+  }.each do |situation, quiet|
+    it "draws the full view without problems when #{situation}" do
+      quiet.each { |list| empty_in_every_app(list) }
+
+      [%w[og_plus landscape], %w[v2 landscape], %w[v2 portrait]].each do |device, orientation|
+        screen = trmnl.render(view: 'full', device:, orientation: orientation.to_sym, mocks:, custom_fields:, now:)
+
+        expect(screen.problems).to be_empty, "#{device} #{orientation}: #{screen.problems.inspect}"
+        expect(screen.overflowing).to be_empty, "#{device} #{orientation}: #{screen.overflowing.inspect}"
+      end
+    end
+
+    it "looks as it did: full on v2 when #{situation}" do
+      quiet.each { |list| empty_in_every_app(list) }
+
+      expect(trmnl.render(view: 'full', device: 'v2', mocks:, custom_fields:, now:)).to match_snapshot
+    end
   end
 
   it 'merges every app, newest first, naming each row\'s app, when App is blank' do
@@ -137,5 +158,17 @@ RSpec.describe 'AppSignal' do
 
     expect(screen.result.html).to include('AppSignal did not answer')
     expect(screen.result.html).to include('Not authorized')
+  end
+
+  def empty_in_every_app(list)
+    response.dig('data', 'organization', 'apps').each do |app|
+      case list
+      when 'exceptions' then app.merge!('openExceptions' => [], 'exceptionIncidents' => [])
+      when 'performance' then app.merge!('openPerformance' => [], 'performanceIncidents' => [])
+      when 'monitors'
+        app['uptimeMonitors'].each { |monitor| monitor['alerts'] = [] }
+        app['checkIns']['triggers'].each { |check_in| check_in['lastState'] = 'FINISHED' }
+      end
+    end
   end
 end

@@ -10,8 +10,20 @@
 {% else %}
   {% assign count_size = "lg:landscape:value--mega lg:portrait:value--xxxlarge" %}
 {% endif %}
+{% assign busy_lists = 0 %}
+{% if exceptions.size > 0 %}{% assign busy_lists = busy_lists | plus: 1 %}{% endif %}
+{% if performances.size > 0 %}{% assign busy_lists = busy_lists | plus: 1 %}{% endif %}
+{% if monitors_down_list.size > 0 %}{% assign busy_lists = busy_lists | plus: 1 %}{% endif %}
+{% comment %}
+  On the TRMNL X in landscape, each count heads its own list. When some lists
+  are empty and others are not, an empty list hides and its column narrows to
+  its count, leaving the width to the lists with entries.
+{% endcomment %}
+<style>
+  .screen--lg:not(.screen--portrait) .appsignal-columns > .column--compact { flex: 0 0 auto; width: auto; padding-right: 48px; }
+</style>
 <div class="layout layout--col gap--base">
-  <div class="grid grid--cols-3 w--full">
+  <div class="grid grid--cols-3 w--full lg:landscape:hidden">
     <div class="item">
       <div class="content">
         <span class="value value--xlarge {{ count_size }} value--tnums">{% render "capped_count", count: open_exception_count %}</span>
@@ -26,42 +38,69 @@
     </div>
     <div class="item">
       <div class="content">
-        <span class="value value--xlarge {{ count_size }} value--tnums">{{ monitors_down }}<span class="text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+        <span class="value value--xlarge {{ count_size }} value--tnums">{{ monitors_down }}<span class="inline-block text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
         <span class="label lg:label--xlarge">Monitors down</span>
       </div>
     </div>
   </div>
 
-  <div class="columns w--full">
-    <div class="column" data-overflow="true" data-overflow-counter="true">
-      <span class="label label--underline lg:label--xlarge">Latest errors</span>
+  <div class="columns appsignal-columns stretch w--full">
+    {% if busy_lists > 0 and exceptions.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
+    <div class="column{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+      <div class="hidden lg:landscape:block">
+        <div class="item">
+          <div class="content">
+            <span class="value value--xlarge {{ count_size }} value--tnums">{% render "capped_count", count: open_exception_count %}</span>
+            <span class="label lg:label--xlarge">Open errors</span>
+          </div>
+        </div>
+      </div>
+      <span class="label label--underline lg:label--xlarge{% if compact %} lg:landscape:hidden{% endif %}">Latest errors</span>
       {% for entry in exceptions limit: 8 %}
         {% render "exception_item", incident: entry.incident, label: entry.label, now: now_seconds, detailed: true %}
       {% else %}
-        <span class="description lg:description--xlarge">No open errors.</span>
+        <span class="description lg:description--xlarge{% if compact %} lg:landscape:hidden{% endif %}">No open errors.</span>
       {% endfor %}
     </div>
-    <div class="column portrait:hidden" data-overflow="true" data-overflow-counter="true">
-      <span class="label label--underline lg:label--xlarge">Latest performance issues</span>
+    {% if busy_lists > 0 and performances.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
+    <div class="column portrait:hidden{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+      <div class="hidden lg:landscape:block">
+        <div class="item">
+          <div class="content">
+            <span class="value value--xlarge {{ count_size }} value--tnums">{% render "capped_count", count: open_performance_count %}</span>
+            <span class="label lg:label--xlarge">Slow actions</span>
+          </div>
+        </div>
+      </div>
+      <span class="label label--underline lg:label--xlarge{% if compact %} lg:landscape:hidden{% endif %}">Latest performance issues</span>
       {% for entry in performances limit: 8 %}
         {% render "performance_item", incident: entry.incident, label: entry.label, now: now_seconds %}
       {% else %}
-        <span class="description lg:description--xlarge">No open performance issues.</span>
+        <span class="description lg:description--xlarge{% if compact %} lg:landscape:hidden{% endif %}">No open performance issues.</span>
       {% endfor %}
     </div>
     {% comment %}
-      Only monitors that are down are listed; the count above covers the rest.
+      Only monitors that are down are listed; the count covers the rest.
       Only the TRMNL X in landscape is wide enough for a third column.
     {% endcomment %}
-    <div class="column hidden lg:flex lg:portrait:hidden" data-overflow="true" data-overflow-counter="true">
-      <span class="label label--underline lg:label--xlarge">Failing monitors</span>
+    {% if busy_lists > 0 and monitors_down_list.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
+    <div class="column hidden lg:flex lg:portrait:hidden{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+      <div class="hidden lg:landscape:block">
+        <div class="item">
+          <div class="content">
+            <span class="value value--xlarge {{ count_size }} value--tnums">{{ monitors_down }}<span class="inline-block text--gray-50 1bit:text--black">/{{ monitor_count }}</span></span>
+            <span class="label lg:label--xlarge">Monitors down</span>
+          </div>
+        </div>
+      </div>
+      <span class="label label--underline lg:label--xlarge{% if compact %} lg:landscape:hidden{% endif %}">Failing monitors</span>
       {% for entry in monitors_down_list %}
         {% if entry.kind == "uptime" %}{% render "uptime_item", monitor: entry.monitor, label: entry.label %}{% else %}{% render "check_in_item", check_in: entry.monitor, label: entry.label, now: now_seconds %}{% endif %}
       {% endfor %}
       {% if monitor_count == 0 %}
-        <span class="description lg:description--xlarge">No monitors.</span>
+        <span class="description lg:description--xlarge{% if compact %} lg:landscape:hidden{% endif %}">No monitors.</span>
       {% elsif monitors_down == 0 %}
-        <span class="description lg:description--xlarge">All {{ monitor_count }} monitors up.</span>
+        <span class="description lg:description--xlarge{% if compact %} lg:landscape:hidden{% endif %}">All {{ monitor_count }} monitors up.</span>
       {% endif %}
     </div>
   </div>
