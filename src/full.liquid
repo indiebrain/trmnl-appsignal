@@ -19,9 +19,6 @@
   are empty and others are not, an empty list hides and its column narrows to
   its count, leaving the width to the lists with entries.
 {% endcomment %}
-<style>
-  .screen--lg:not(.screen--portrait) .appsignal-columns > .column--compact { flex: 0 0 auto; width: auto; padding-right: 48px; }
-</style>
 <div class="layout layout--col gap--base">
   <div class="grid grid--cols-3 w--full lg:landscape:hidden">
     <div class="item">
@@ -44,9 +41,9 @@
     </div>
   </div>
 
-  <div class="columns appsignal-columns stretch w--full">
+  <div class="columns stretch w--full lg:landscape:flex">
     {% if busy_lists > 0 and exceptions.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
-    <div class="column{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+    <div class="column{% if compact %} lg:landscape:flex-none lg:landscape:w--auto pr--0 lg:landscape:pr--12{% endif %}" data-overflow="true" data-overflow-counter="true">
       <div class="hidden lg:landscape:block">
         <div class="item">
           <div class="content">
@@ -63,7 +60,7 @@
       {% endfor %}
     </div>
     {% if busy_lists > 0 and performances.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
-    <div class="column portrait:hidden{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+    <div class="column portrait:hidden{% if compact %} lg:landscape:flex-none lg:landscape:w--auto pr--0 lg:landscape:pr--12{% endif %}" data-overflow="true" data-overflow-counter="true">
       <div class="hidden lg:landscape:block">
         <div class="item">
           <div class="content">
@@ -84,7 +81,7 @@
       Only the TRMNL X in landscape is wide enough for a third column.
     {% endcomment %}
     {% if busy_lists > 0 and monitors_down_list.size == 0 %}{% assign compact = true %}{% else %}{% assign compact = false %}{% endif %}
-    <div class="column hidden lg:flex lg:portrait:hidden{% if compact %} column--compact{% endif %}" data-overflow="true" data-overflow-counter="true">
+    <div class="column hidden lg:flex lg:portrait:hidden{% if compact %} lg:landscape:flex-none lg:landscape:w--auto pr--0 lg:landscape:pr--12{% endif %}" data-overflow="true" data-overflow-counter="true">
       <div class="hidden lg:landscape:block">
         <div class="item">
           <div class="content">

@@ -29,8 +29,11 @@ keep their names whole, while the counts stay readable from across a room.
   a row of their own there.
 - The framework's "and N more" counter fills a list only to the bottom of its
   `.columns` box, so that box stretches to the bottom of the screen.
-- The framework has no class that sizes a column to its content on one device
-  and orientation, so the view carries a small style rule for it.
+- TRMNL asks recipes to use framework classes instead of custom CSS. Its
+  sizing classes (`lg:landscape:flex-none`) apply only inside a parent with
+  the matching display class (`lg:landscape:flex`), and its padding classes
+  apply only alongside a plain `pr--` class, so the narrow column carries
+  `pr--0` as well.
 
 ## Decisions
 - Rejected: fixed width shares (one part for an empty column, two for a list).
